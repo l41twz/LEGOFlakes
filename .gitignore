@@ -20,4 +20,7 @@ secrets/*.key
 *.swp
 *.swo
 *~
+**/.agent/
+**/.agents/
 
+lego-tui
