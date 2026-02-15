@@ -1,0 +1,30 @@
+[host]
+  preset_name = "vm1"
+  host_name = "vm1"
+  state_version = "26.05"
+
+[user]
+  name = "user"
+  description = "user"
+
+[locale]
+  timezone = "America/Sao_Paulo"
+  default_locale = "en_US.UTF-8"
+  lc_address = "pt_BR.UTF-8"
+  lc_identification = "pt_BR.UTF-8"
+  lc_measurement = "pt_BR.UTF-8"
+  lc_monetary = "pt_BR.UTF-8"
+  lc_name = "pt_BR.UTF-8"
+  lc_numeric = "pt_BR.UTF-8"
+  lc_paper = "pt_BR.UTF-8"
+  lc_telephone = "pt_BR.UTF-8"
+  lc_time = "pt_BR.UTF-8"
+  keymap = "br-abnt2"
+
+[modules]
+  active = ["system/1"]
+
+[metadata]
+  created_at = "2026-02-13T19:27:28Z"
+  last_modified = "2026-02-13T20:31:22Z"
+  last_applied_flake = "vm1-20260213-173122.nix"

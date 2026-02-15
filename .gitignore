@@ -1,0 +1,24 @@
+# Build artifacts
+result
+result-*
+
+# Secrets (plaintext)
+hosts/*/secrets/*.key
+hosts/*/secrets/*.pem
+hosts/*/secrets/*.age
+*.secret
+secrets/*.key
+
+# Nix
+.direnv/
+.envrc
+
+# Editor
+.vscode/
+.idea/
+.code-workspace
+*.swp
+*.swo
+*~
+core
+lego-tui
