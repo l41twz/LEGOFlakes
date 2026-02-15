@@ -16,9 +16,8 @@ secrets/*.key
 # Editor
 .vscode/
 .idea/
-.code-workspace
+*.code-workspace
 *.swp
 *.swo
 *~
-core
-lego-tui
+
