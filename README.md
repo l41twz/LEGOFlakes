@@ -21,7 +21,7 @@ Um construtor de configurações NixOS moderno e modular, projetado para clareza
 ### Início Rápido
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/LEGOFlakes.git
+git clone https://github.com/l41twz/LEGOFlakes.git
 cd LEGOFlakes
 
 # Compile a LEGO TUI
@@ -43,6 +43,7 @@ O projeto é estruturado para separar a lógica da configuração:
 ├── modules/           # Módulos NixOS atômicos (sistema, hardware, apps, etc.)
 ├── presets/           # Configurações específicas de host (.toml)
 ├── scripts/           # Scripts de automação em Nushell
+├── secrets/           # Arquivos de configuração de segredo
 ├── flakes/            # Saídas de Flakes geradas
 └── templates/         # Templates Nix base usados para geração
 ```
