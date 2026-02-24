@@ -8,6 +8,7 @@ Um construtor de configurações NixOS moderno e modular, projetado para clareza
 - **🧩 Arquitetura Modular**: Módulos atômicos "Zero-Header" que tornam a reutilização de configurações sem esforço.
 - **🛠️ Sistema de Presets Automatizado**: Defina hosts e configurações de usuário via arquivos `.toml` simples.
 - **💾 Integração com Disko**: Ferramentas de particionamento de disco integradas para instalações fáceis.
+- **🔗 Flake Inputs Dinâmicos**: Declare flakes externos em um único JSON — sem editar o builder ou template.
 - **🤖 Assistência de IA**: Integração profunda com Gemini para assistência no editor e ajuda na configuração.
 - **🐚 Orquestração com Nushell**: Utiliza scripts shell modernos para operações de backend robustas.
 
@@ -41,6 +42,7 @@ O projeto é estruturado para separar a lógica da configuração:
 ```text
 ├── cmd/lego-tui/      # Código fonte da TUI interativa em Go
 ├── modules/           # Módulos NixOS atômicos (sistema, hardware, apps, etc.)
+├── flake-inputs.json  # Declaração de flakes externos (zen-browser, etc.)
 ├── presets/           # Configurações específicas de host (.toml)
 ├── scripts/           # Scripts de automação em Nushell
 ├── secrets/           # Arquivos de configuração de segredo
