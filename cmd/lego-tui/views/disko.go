@@ -469,7 +469,7 @@ func (m DiskoModel) View() string {
 		title := styles.Subtitle.Render("PERIGO: formatar disco?")
 		fname := filepath.Base(m.selected)
 		warn := styles.ErrorStyle.Render(fmt.Sprintf(
-			"\n  ⚠️  ATENÇÃO: Isso irá DESTRUIR DADOS no disco configurado em '%s'.\n  Tem certeza absoluta?\n", fname))
+			"\n  ⚠️  ATENÇÃO: Isso irá DESTRUIR DADOS no disco configurado em '%s'.\n  Tem certeza absoluta?\\n", fname))
 		s = title + warn
 
 	case diskoSubRun:
