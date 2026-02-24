@@ -31,9 +31,11 @@
    - `users.users.<nome>`
    - Configurações de timezone e locale
 
-6. **Prefira `with pkgs;`** para listar pacotes
+6. **Prefira `with pkgs;`** para listar pacotes (exceto para args de flakes externos)
 
-7. **Validação obrigatória**: Todo módulo passa por `nix-instantiate --parse`
+7. **Flakes externos**: Pacotes não disponíveis no nixpkgs devem ser declarados em `flake-inputs.json`. No módulo, referencie o arg diretamente (ex: `zen-browser-pkg`) sem `with pkgs;`
+
+8. **Validação obrigatória**: Todo módulo passa por `nix-instantiate --parse`
 
 ## CHECKLIST
 
@@ -42,6 +44,7 @@
 - [ ] Código é Nix puro (sem headers de função)?
 - [ ] NÃO conflita com template base?
 - [ ] Sintaxe Nix correta?
+- [ ] Usa arg de flake externo? Verificar se existe em `flake-inputs.json`
 
 ## EXEMPLO VÁLIDO
 
