@@ -3,11 +3,27 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
+    {{FLAKE_INPUTS}}
   };
 
-  outputs = { self, nixpkgs, ... }: {
-    nixosConfigurations.{{HOST_NAME}} = nixpkgs.lib.nixosSystem {
+  outputs = { self, nixpkgs, nixpkgs-master, {{FLAKE_OUTPUT_ARGS}}... }:
+    let
       system = "x86_64-linux";
+      pkgs-master = import nixpkgs-master {
+        inherit system;
+        config = { allowUnfree = true; };
+      };
+    in {
+    {{DEVSHELLS_INJECTION}}
+    nixosConfigurations.{{HOST_NAME}} = nixpkgs.lib.nixosSystem {
+      inherit system;
+
+      specialArgs = {
+        inherit pkgs-master;
+        {{FLAKE_SPECIAL_ARGS}}
+      };
+
       modules = [
         ({ pkgs, lib, config, ... }: {
           # =============================================
@@ -45,14 +61,11 @@
 
           system.stateVersion = "{{STATE_VERSION}}";
 
-          # =============================================
-          # SECTION: MODULES START
-          # =============================================
-          {{MODULE_INJECTION_POINT}}
-          # =============================================
-          # SECTION: MODULES END
-          # =============================================
         })
+        # =============================================
+        # LEGO MODULES
+        # =============================================
+        {{MODULE_INJECTION_POINT}}
       ];
     };
   };
