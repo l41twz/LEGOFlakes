@@ -1,0 +1,16 @@
+[
+  {
+    "name": "zen-browser",
+    "url": "github:youwen5/zen-browser-flake",
+    "arg": "zen-browser-pkg",
+    "attr": "packages.${system}.default",
+    "follows_nixpkgs": false
+  },
+  {
+    "name": "nix-gaming",
+    "url": "github:fufexan/nix-gaming",
+    "arg": "nix-gaming-pkgs",
+    "attr": "packages.${system}",
+    "follows_nixpkgs": true
+  }
+]

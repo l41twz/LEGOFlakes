@@ -1,0 +1,23 @@
+[
+  {
+    "name": "dev-tools",
+    "description": "Ferramentas gerais de desenvolvimento",
+    "packages": [
+      "pkgs-master.vscode",
+      "pkgs-master.antigravity",
+      "mcp-nixos",
+      "nil",
+      "nixpkgs-fmt",
+      "python3",
+      "git",
+      "nodejs",
+      "nodePackages.npm",
+      "go",
+      "gcc",
+      "micro",
+      "lapce",
+      "fish"
+    ],
+    "shellHook": "echo '🔧 Ambiente dev-tools ativado com sucesso!'\nexec fish"
+  }
+]
