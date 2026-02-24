@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -26,6 +27,57 @@ type ModuleInfo struct {
 	Purpose  string
 	RelPath  string // category/name
 	FullPath string
+}
+
+// FlakeInput represents an external flake input from flake-inputs.json
+type FlakeInput struct {
+	Name           string `json:"name"`
+	URL            string `json:"url"`
+	Arg            string `json:"arg"`
+	Attr           string `json:"attr"`
+	FollowsNixpkgs bool   `json:"follows_nixpkgs"`
+}
+
+// LoadFlakeInputs reads flake-inputs.json from modules/overlays directory
+func LoadFlakeInputs(root string) ([]FlakeInput, error) {
+	path := filepath.Join(root, "modules", "overlays", "flake-inputs.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []FlakeInput{}, nil
+		}
+		return nil, fmt.Errorf("erro ao ler flake-inputs.json: %w", err)
+	}
+	var inputs []FlakeInput
+	if err := json.Unmarshal(data, &inputs); err != nil {
+		return nil, fmt.Errorf("erro ao parsear flake-inputs.json: %w", err)
+	}
+	return inputs, nil
+}
+
+// DevShell represents a development environment from devshells.json
+type DevShell struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Packages    []string `json:"packages"`
+	ShellHook   string   `json:"shellHook"`
+}
+
+// LoadDevShells reads devshells.json from modules/overlays directory
+func LoadDevShells(root string) ([]DevShell, error) {
+	path := filepath.Join(root, "modules", "overlays", "devshells.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []DevShell{}, nil
+		}
+		return nil, fmt.Errorf("erro ao ler devshells.json: %w", err)
+	}
+	var shells []DevShell
+	if err := json.Unmarshal(data, &shells); err != nil {
+		return nil, fmt.Errorf("erro ao parsear devshells.json: %w", err)
+	}
+	return shells, nil
 }
 
 // ListModules scans modules/ directory
@@ -91,9 +143,34 @@ func BuildFlake(root string, preset *Preset, modules []string, customName string
 		return "", fmt.Errorf("template não encontrado: %w", err)
 	}
 
-	// Build module content
+	// Load flake inputs
+	flakeInputs, err := LoadFlakeInputs(root)
+	if err != nil {
+		return "", fmt.Errorf("erro ao carregar flake inputs: %w", err)
+	}
+
+	// Load devshells
+	devShells, err := LoadDevShells(root)
+	if err != nil {
+		return "", fmt.Errorf("erro ao carregar devshells: %w", err)
+	}
+
+	// Generate flake input snippets
+	flakeInputsSnippet, flakeOutputArgs, flakeSpecialArgs, moduleArgs := generateFlakeSnippets(flakeInputs)
+
+	// Generate devshells snippet
+	devShellsSnippet := generateDevShellsSnippet(devShells)
+
+	// Build module wrapper args
+	wrapperArgs := "pkgs, lib, config, pkgs-master"
+	for _, a := range moduleArgs {
+		wrapperArgs += ", " + a
+	}
+
+	// Build module content — each module becomes a separate entry in modules list
 	var moduleContent strings.Builder
-	indent := "          "
+	indent := "        " // 8 spaces — aligns with modules list level
+	bodyIndent := indent + "  "
 	for _, mod := range modules {
 		modPath := filepath.Join(root, "modules", mod+".nix")
 		data, err := os.ReadFile(modPath)
@@ -106,17 +183,19 @@ func BuildFlake(root string, preset *Preset, modules []string, customName string
 		}
 		modName := strings.TrimPrefix(lines[0], "# NIXOS-LEGO-MODULE: ")
 		modPurpose := strings.TrimPrefix(lines[1], "# PURPOSE: ")
-		body := strings.Join(lines[4:], "\n")
+		body := strings.TrimRight(strings.Join(lines[4:], "\n"), "\n ")
 
 		moduleContent.WriteString("\n")
 		moduleContent.WriteString(indent + "# ── " + modName + " ── " + modPurpose + "\n")
+		moduleContent.WriteString(indent + "({ " + wrapperArgs + ", ... }: {\n")
 		for _, l := range strings.Split(body, "\n") {
 			if strings.TrimSpace(l) == "" {
 				moduleContent.WriteString("\n")
 			} else {
-				moduleContent.WriteString(indent + l + "\n")
+				moduleContent.WriteString(bodyIndent + l + "\n")
 			}
 		}
+		moduleContent.WriteString(indent + "})\n")
 	}
 
 	// Replace placeholders
@@ -139,6 +218,10 @@ func BuildFlake(root string, preset *Preset, modules []string, customName string
 		"{{LC_TELEPHONE}}":           preset.Locale.LcTelephone,
 		"{{LC_TIME}}":                preset.Locale.LcTime,
 		"{{KEYMAP}}":                 preset.Locale.Keymap,
+		"{{FLAKE_INPUTS}}":           flakeInputsSnippet,
+		"{{FLAKE_OUTPUT_ARGS}}":      flakeOutputArgs,
+		"{{FLAKE_SPECIAL_ARGS}}":     flakeSpecialArgs,
+		"{{DEVSHELLS_INJECTION}}":    devShellsSnippet,
 		"{{MODULE_INJECTION_POINT}}": moduleContent.String(),
 	}
 	for k, v := range replacements {
@@ -160,6 +243,61 @@ func BuildFlake(root string, preset *Preset, modules []string, customName string
 	preset.Modules.Active = modules
 	preset.Metadata.LastAppliedFlake = outName
 	return outPath, nil
+}
+
+// generateFlakeSnippets produces the 3 dynamic blocks + module arg list
+func generateFlakeSnippets(inputs []FlakeInput) (inputsBlock, outputArgs, specialArgs string, moduleArgList []string) {
+	if len(inputs) == 0 {
+		return "", "", "", nil
+	}
+
+	var inLines, outArgs, saLines []string
+
+	for _, fi := range inputs {
+		// inputs block: zen-browser.url = "github:...";
+		line := fmt.Sprintf("    %s.url = \"%s\";", fi.Name, fi.URL)
+		if fi.FollowsNixpkgs {
+			line += fmt.Sprintf("\n    %s.inputs.nixpkgs.follows = \"nixpkgs\";", fi.Name)
+		}
+		inLines = append(inLines, line)
+
+		// output args: zen-browser,
+		outArgs = append(outArgs, fi.Name+", ")
+
+		// specialArgs: zen-browser-pkg = zen-browser.packages.${system}.default;
+		saLines = append(saLines, fmt.Sprintf("        %s = %s.%s;", fi.Arg, fi.Name, fi.Attr))
+
+		// module arg list
+		moduleArgList = append(moduleArgList, fi.Arg)
+	}
+
+	inputsBlock = strings.Join(inLines, "\n")
+	outputArgs = strings.Join(outArgs, "")
+	specialArgs = strings.Join(saLines, "\n")
+	return
+}
+
+func generateDevShellsSnippet(shells []DevShell) string {
+	if len(shells) == 0 {
+		return ""
+	}
+
+	var sb strings.Builder
+	sb.WriteString("devShells.${system} = {\n")
+	for _, shell := range shells {
+		sb.WriteString(fmt.Sprintf("      \"%s\" = pkgs.mkShell {\n", shell.Name))
+		sb.WriteString("        packages = with pkgs; [\n")
+		for _, pkg := range shell.Packages {
+			sb.WriteString(fmt.Sprintf("          %s\n", pkg))
+		}
+		sb.WriteString("        ];\n")
+		if shell.ShellHook != "" {
+			sb.WriteString(fmt.Sprintf("        shellHook = ''\n          %s\n        '';\n", shell.ShellHook))
+		}
+		sb.WriteString("      };\n")
+	}
+	sb.WriteString("    };\n")
+	return sb.String()
 }
 
 // NixosRebuild executes nixos-rebuild switch
