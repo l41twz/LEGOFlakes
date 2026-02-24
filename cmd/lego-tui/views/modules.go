@@ -255,11 +255,7 @@ func (m ModulesModel) updateCreate(msg tea.Msg) (ModulesModel, tea.Cmd) {
 				}
 				// Create module file with LEGO header
 				path := fmt.Sprintf("%s/modules/%s/%s.nix", m.rootDir, m.newCategory, name)
-				content := fmt.Sprintf(`# NIXOS-LEGO-MODULE: %s
-# PURPOSE: <descreva o propósito>
-# CATEGORY: %s
-# AUTHOR: user
-`, name, m.newCategory)
+				content := fmt.Sprintf(`# NIXOS-LEGO-MODULE: %s\n# PURPOSE: <descreva o propósito>\n# CATEGORY: %s\n# AUTHOR: user\n`, name, m.newCategory)
 				if err := os.WriteFile(path, []byte(content), 0644); err != nil {
 					m.message = "Erro: " + err.Error()
 					return m, nil
@@ -322,11 +318,11 @@ func (m ModulesModel) View() string {
 	var s string
 	switch m.subState {
 	case moduleSubList:
-		header := ""
+		heade := ""
 		if m.message != "" {
-			header = styles.SuccessStyle.Render(m.message) + "\n\n"
+			heade = styles.SuccessStyle.Render(m.message) + "\n\n"
 		}
-		s = header + m.list.View()
+		s = heade + m.list.View()
 	case moduleSubCreate:
 		switch m.createStep {
 		case createStepCategory:
@@ -342,7 +338,7 @@ func (m ModulesModel) View() string {
 		}
 	case moduleSubConfirmDelete:
 		title := styles.Subtitle.Render("CONFIRMAR DELEÇÃO")
-		dialog := fmt.Sprintf("\n  Tem certeza que deseja deletar o módulo:\n  %s?\n\n", styles.ErrorStyle.Render(m.selectedModule.Title()))
+		dialog := fmt.Sprintf("\n  Tem certeza que deseja deletar o módulo:\n  %s?\\n\\n", styles.ErrorStyle.Render(m.selectedModule.Title()))
 		s = title + dialog
 	}
 	return lipgloss.NewStyle().Padding(1, 2).Render(s)

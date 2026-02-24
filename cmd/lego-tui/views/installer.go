@@ -236,7 +236,7 @@ func (m InstallerModel) View() string {
 	case installConfirm:
 		fname := filepath.Base(m.selected)
 		warn := styles.WarningStyle.Render(fmt.Sprintf(
-			"\n  ⚠️  Aplicar '%s' no sistema?\n  Isso irá executar nixos-rebuild switch.\n", fname))
+			"\n  ⚠️  Aplicar '%s' no sistema?\\n  Isso irá executar nixos-rebuild switch.\\n", fname))
 		s = title + warn
 	case installRunning:
 		s = title + "\n\n  " + m.spinner.View() + " Executando nixos-rebuild switch..."
@@ -255,7 +255,7 @@ func (m InstallerModel) View() string {
 		}
 		s = title + "\n\n" +
 			styles.ErrorStyle.Render("  ❌ Erro ao aplicar:") + "\n" +
-			styles.MutedStyle.Render("  "+m.errMsg) + "\n\n" +
+			styles.MutedStyle.Render("  " +m.errMsg) + "\n\n" +
 			styles.MutedStyle.Render(out)
 	}
 

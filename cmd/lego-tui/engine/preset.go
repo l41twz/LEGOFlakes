@@ -109,7 +109,7 @@ func NewDefaultPreset(name, userName string) *Preset {
 		Host: HostConfig{
 			PresetName:   name,
 			HostName:     name,
-			StateVersion: "24.05",
+			StateVersion: "26.05",
 		},
 		User: UserConfig{
 			Name:        userName,
