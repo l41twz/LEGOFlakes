@@ -1,6 +1,10 @@
 # NIXOS-LEGO-MODULE: zram-swap
-# PURPOSE: Enable ZRAM compressed swap
+# PURPOSE: ZRAM compressed swap with zstd algorithm
 # CATEGORY: system
 # ---
-zramSwap.enable = true;
-zramSwap.memoryPercent = 50;
+zramSwap = {
+  enable = true;
+  algorithm = "zstd";
+  memoryPercent = 100;
+  priority = 100;
+};

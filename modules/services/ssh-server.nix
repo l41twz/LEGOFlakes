@@ -1,7 +1,11 @@
 # NIXOS-LEGO-MODULE: ssh-server
-# PURPOSE: OpenSSH server configuration
+# PURPOSE: OpenSSH server with password auth enabled
 # CATEGORY: services
 # ---
-services.openssh.enable = true;
-services.openssh.settings.PermitRootLogin = "no";
-services.openssh.settings.PasswordAuthentication = false;
+services.openssh = {
+  enable = true;
+  settings = {
+    PasswordAuthentication = true;
+    PermitRootLogin = "yes";
+  };
+};
