@@ -244,9 +244,9 @@ func (m model) View() string {
 	for i, name := range tabNames {
 		label := strings.ToUpper(name)
 		if i == m.activeTab {
-			tabs = append(tabs, styles.ActiveTab.Render(label))
+			tabs = append(tabs, styles.ActiveTab.Render("● "+label))
 		} else {
-			tabs = append(tabs, styles.InactiveTab.Render(label))
+			tabs = append(tabs, styles.InactiveTab.Render("  "+label))
 		}
 	}
 	tabBar := styles.TabBar.Width(m.width).Render(lipgloss.JoinHorizontal(lipgloss.Top, tabs...))
