@@ -10,6 +10,10 @@
   outputs = { self, nixpkgs, nixpkgs-master, {{FLAKE_OUTPUT_ARGS}}... }:
     let
       system = "x86_64-linux";
+      pkgs = import nixpkgs {
+        inherit system;
+        config = { allowUnfree = true; };
+      };
       pkgs-master = import nixpkgs-master {
         inherit system;
         config = { allowUnfree = true; };
