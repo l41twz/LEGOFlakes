@@ -229,7 +229,7 @@ func (m model) onTabSwitch(prevTab int) (model, tea.Cmd) {
 	case tabBuilder:
 		return m, m.builder.FocusInput()
 	case tabInstaller:
-		m.installer.RefreshFlakes(m.hosts.SelectedPreset())
+		m.installer.RefreshFlakes(m.hosts.SelectedPreset(), m.hosts.SelectedHostName())
 	case tabScripts:
 		m.scripts.Refresh()
 	case tabDisko:
@@ -239,7 +239,7 @@ func (m model) onTabSwitch(prevTab int) (model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	// ── Tab bar ──────────────────────────────────────────────
+	// ── Tab bar ─────────────────────────────────────────────────
 	var tabs []string
 	for i, name := range tabNames {
 		label := strings.ToUpper(name)
@@ -251,7 +251,7 @@ func (m model) View() string {
 	}
 	tabBar := styles.TabBar.Width(m.width).Render(lipgloss.JoinHorizontal(lipgloss.Top, tabs...))
 
-	// ── Help bar (bottom) ───────────────────────────────────
+	// ── Help bar (bottom) ───────────────────────────────────────
 	var helpText string
 	switch m.activeTab {
 	case tabIntro:
@@ -273,7 +273,7 @@ func (m model) View() string {
 	}
 	helpBar := styles.HelpBar.Width(m.width).Render(helpText)
 
-	// ── Content ──────────────────────────────────────────────
+	// ── Content ─────────────────────────────────────────────────
 	tabBarH := lipgloss.Height(tabBar)
 	helpBarH := lipgloss.Height(helpBar)
 	contentH := m.height - tabBarH - helpBarH - 1
