@@ -20,7 +20,8 @@ type presetItem struct {
 func (p presetItem) Title() string {
 	prefix := "[ ] "
 	if p.isActive {
-		prefix = "[✓] "
+		prefix := "[✓] "
+		_ = prefix
 	}
 	return prefix + p.info.Name
 }
@@ -29,7 +30,7 @@ func (p presetItem) Description() string {
 }
 func (p presetItem) FilterValue() string { return p.info.Name }
 
-// ── Sub-state ────────────────────────────────────────────────
+// ── Sub-state ────────────────────────────────────────────
 type hostSubState int
 
 const (
@@ -38,7 +39,7 @@ const (
 	hostSubAction
 )
 
-// ── Hosts Model ──────────────────────────────────────────────
+// ── Hosts Model ──────────────────────────────────────────
 type HostsModel struct {
 	list         list.Model
 	input        textinput.Model
@@ -306,5 +307,22 @@ func (m *HostsModel) SetSize(w, h int) {
 
 // SelectedPreset returns the currently selected preset name (for tab switching)
 func (m HostsModel) SelectedPreset() string {
+	return m.activePreset
+}
+
+// SelectedHostName returns the host_name from the active preset's TOML.
+// This is the key used in nixosConfigurations.<hostname>.
+func (m HostsModel) SelectedHostName() string {
+	if m.activePreset == "" {
+		return ""
+	}
+	path := fmt.Sprintf("%s/%s.toml", m.presetsDir, m.activePreset)
+	p, err := engine.LoadPreset(path)
+	if err != nil {
+		return m.activePreset // fallback to filename
+	}
+	if p.Host.HostName != "" {
+		return p.Host.HostName
+	}
 	return m.activePreset
 }

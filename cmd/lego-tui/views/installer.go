@@ -77,7 +77,7 @@ func NewInstallerModel(rootDir string) InstallerModel {
 	}
 }
 
-func (m *InstallerModel) RefreshFlakes(presetName string) {
+func (m *InstallerModel) RefreshFlakes(presetName, hostName string) {
 	var items []list.Item
 	dir := filepath.Join(m.rootDir, "flakes")
 	files, _ := filepath.Glob(filepath.Join(dir, "*.nix"))
@@ -104,7 +104,7 @@ func (m *InstallerModel) RefreshFlakes(presetName string) {
 	l.SetFilteringEnabled(false)
 	l.SetShowHelp(false)
 	m.flakeList = l
-	m.hostname = presetName
+	m.hostname = hostName
 }
 
 func (m *InstallerModel) openEditor(path string) tea.Cmd {
