@@ -301,9 +301,29 @@ func generateDevShellsSnippet(shells []DevShell) string {
 }
 
 // NixosRebuild executes nixos-rebuild switch
-func NixosRebuild(flakeDir, hostname string) (string, error) {
+func NixosRebuild(flakePath, hostname string) (string, error) {
+	// Root dir is project root
+	flakeDir := filepath.Dir(flakePath)
+	gitRoot := filepath.Dir(flakeDir)
+
+	targetFlakeNix := filepath.Join(gitRoot, "flake.nix")
+
+	data, err := os.ReadFile(flakePath)
+	if err != nil {
+		return "", fmt.Errorf("erro lendo flake gerado: %w", err)
+	}
+	if err := os.WriteFile(targetFlakeNix, data, 0644); err != nil {
+		return "", fmt.Errorf("erro criando flake.nix na raiz: %w", err)
+	}
+
+	addCmd := exec.Command("git", "add", "flakes", "flake.nix")
+	addCmd.Dir = gitRoot
+	if err := addCmd.Run(); err != nil {
+		fmt.Printf("Aviso: Falha ao rastrear arquivos no git: %v\n", err)
+	}
+
 	cmd := exec.Command("sudo", "nixos-rebuild", "switch",
-		"--flake", flakeDir+"#"+hostname, "--show-trace")
+		"--flake", gitRoot+"#"+hostname, "--show-trace")
 	out, err := cmd.CombinedOutput()
 	return string(out), err
 }

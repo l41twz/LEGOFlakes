@@ -206,8 +206,7 @@ func (m InstallerModel) Update(msg tea.Msg) (InstallerModel, tea.Cmd) {
 
 func (m InstallerModel) runRebuild() tea.Cmd {
 	return func() tea.Msg {
-		flakeDir := filepath.Dir(m.selected)
-		out, err := engine.NixosRebuild(flakeDir, m.hostname)
+		out, err := engine.NixosRebuild(m.selected, m.hostname)
 		return installResult{output: out, err: err}
 	}
 }
@@ -255,7 +254,7 @@ func (m InstallerModel) View() string {
 		}
 		s = title + "\n\n" +
 			styles.ErrorStyle.Render("  ❌ Erro ao aplicar:") + "\n" +
-			styles.MutedStyle.Render("  " +m.errMsg) + "\n\n" +
+			styles.MutedStyle.Render("  "+m.errMsg) + "\n\n" +
 			styles.MutedStyle.Render(out)
 	}
 
