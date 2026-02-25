@@ -300,8 +300,9 @@ func generateDevShellsSnippet(shells []DevShell) string {
 	return sb.String()
 }
 
-// NixosRebuild executes nixos-rebuild switch
-func NixosRebuild(flakePath, hostname string) (string, error) {
+// PrepareRebuild copies the selected flake to flake.nix, runs git add,
+// and returns the *exec.Cmd ready to be executed interactively.
+func PrepareRebuild(flakePath, hostname string) (*exec.Cmd, error) {
 	// Root dir is project root
 	flakeDir := filepath.Dir(flakePath)
 	gitRoot := filepath.Dir(flakeDir)
@@ -310,10 +311,10 @@ func NixosRebuild(flakePath, hostname string) (string, error) {
 
 	data, err := os.ReadFile(flakePath)
 	if err != nil {
-		return "", fmt.Errorf("erro lendo flake gerado: %w", err)
+		return nil, fmt.Errorf("erro lendo flake gerado: %w", err)
 	}
 	if err := os.WriteFile(targetFlakeNix, data, 0644); err != nil {
-		return "", fmt.Errorf("erro criando flake.nix na raiz: %w", err)
+		return nil, fmt.Errorf("erro criando flake.nix na raiz: %w", err)
 	}
 
 	addCmd := exec.Command("git", "add", "flakes", "flake.nix")
@@ -324,6 +325,6 @@ func NixosRebuild(flakePath, hostname string) (string, error) {
 
 	cmd := exec.Command("sudo", "nixos-rebuild", "switch",
 		"--flake", gitRoot+"#"+hostname, "--show-trace")
-	out, err := cmd.CombinedOutput()
-	return string(out), err
+	cmd.Dir = gitRoot
+	return cmd, nil
 }
