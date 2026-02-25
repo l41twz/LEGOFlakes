@@ -31,6 +31,7 @@ type installResult struct {
 }
 
 type installerEditorFinished struct{ err error }
+type installerRebuildFinished struct{ err error }
 
 // ── Flake list item ──────────────────────────────────────────
 type flakeItem struct {
@@ -130,6 +131,14 @@ func (m InstallerModel) Update(msg tea.Msg) (InstallerModel, tea.Cmd) {
 			m.errMsg = "Erro no editor: " + msg.err.Error()
 		}
 		return m, nil
+	case installerRebuildFinished:
+		if msg.err != nil {
+			m.state = installError
+			m.errMsg = msg.err.Error()
+		} else {
+			m.state = installDone
+		}
+		return m, nil
 	}
 
 	switch m.state {
@@ -163,7 +172,7 @@ func (m InstallerModel) Update(msg tea.Msg) (InstallerModel, tea.Cmd) {
 			switch msg.String() {
 			case "y", "Y":
 				m.state = installRunning
-				return m, tea.Batch(m.spinner.Tick, m.runRebuild())
+				return m, m.runRebuild()
 			case "n", "N", "esc":
 				m.state = installIdle
 				return m, nil
@@ -205,10 +214,18 @@ func (m InstallerModel) Update(msg tea.Msg) (InstallerModel, tea.Cmd) {
 }
 
 func (m InstallerModel) runRebuild() tea.Cmd {
-	return func() tea.Msg {
-		out, err := engine.NixosRebuild(m.selected, m.hostname)
-		return installResult{output: out, err: err}
+	cmd, err := engine.PrepareRebuild(m.selected, m.hostname)
+	if err != nil {
+		return func() tea.Msg {
+			return installerRebuildFinished{err: err}
+		}
 	}
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return tea.ExecProcess(cmd, func(err error) tea.Msg {
+		return installerRebuildFinished{err: err}
+	})
 }
 
 func (m InstallerModel) HelpKeys() string {
