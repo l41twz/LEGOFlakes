@@ -38,5 +38,5 @@ def main [] {
 
     # ── Instala ───────────────────────────────────────────────────────────────
     print $"Instalando NixOS para o host: ($hostname)..."
-    sudo nixos-install --flake $".#($hostname)" --option eval-cache false
+    sudo nixos-install --flake $".#($hostname)" --store /mnt --option eval-cache false
 }
