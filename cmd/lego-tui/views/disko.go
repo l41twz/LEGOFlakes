@@ -412,10 +412,22 @@ func (m DiskoModel) updateRun(msg tea.Msg) (DiskoModel, tea.Cmd) {
 
 func (m DiskoModel) runDisko() tea.Cmd {
 	return func() tea.Msg {
-		// sudo nix run github:nix-community/disko -- --mode disko <file>
 		cmd := exec.Command("sudo", "nix", "run", "github:nix-community/disko", "--", "--mode", "disko", m.selected)
 		out, err := cmd.CombinedOutput()
-		return diskoResult{output: string(out), err: err}
+		if err != nil {
+			return diskoResult{output: string(out), err: err}
+		}
+
+		destDir := "/mnt/etc/nixos"
+		exec.Command("sudo", "mkdir", "-p", destDir).Run()
+
+		destFile := filepath.Join(destDir, filepath.Base(m.selected))
+		cpCmd := exec.Command("sudo", "cp", m.selected, destFile)
+		if cpOut, cpErr := cpCmd.CombinedOutput(); cpErr != nil {
+			return diskoResult{output: string(out) + "\nErro ao copiar para /mnt: " + string(cpOut), err: cpErr}
+		}
+
+		return diskoResult{output: string(out) + fmt.Sprintf("\nLayout copiado para %s com sucesso.", destFile), err: nil}
 	}
 }
 
