@@ -36,7 +36,15 @@ def main [] {
     # ── Limpa cache de avaliações anteriores ─────────────────────────────────
     sudo rm -rf /root/.cache/nix
 
+    # ── Redireciona o Nix store para o disco (evita esgotar o tmpfs da ISO) ──
+    # /mnt/nix já tem espaço; bind mount faz /nix da ISO apontar para ele.
+    let is_mounted = (sudo mountpoint -q /nix | complete | get exit_code) == 0
+    if not $is_mounted {
+        print "Redirecionando /nix para o disco..."
+        sudo mount --bind /mnt/nix /nix
+    }
+
     # ── Instala ───────────────────────────────────────────────────────────────
     print $"Instalando NixOS para o host: ($hostname)..."
-    sudo nixos-install --flake $".#($hostname)" --store /mnt --option eval-cache false
+    sudo nixos-install --flake $".#($hostname)" --option eval-cache false
 }
