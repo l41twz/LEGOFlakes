@@ -1,20 +1,38 @@
 #!/usr/bin/env nu
 
-def main [host_name: string] {
-    let install_path = "/mnt/etc/nixos"
+def main [] {
+    let source = "/home/nixos/LEGOFlakes/flakes/"
+    let target = "/mnt/etc/nixos/"
 
-    # Muda para o diretório de instalação
-    cd $install_path
+    # 1. Cópia com privilégios de root
+    print "Copiando arquivos para /mnt/etc/nixos..."
+    sudo mkdir -p $target
+    sudo bash -c $"cp -r ($source)* ($target)"
 
-    # Se você usa Git no seu flake, é necessário dar 'add' 
-    # para o Nix reconhecer os arquivos novos/modificados
-    if (".git" | path exists) {
-        git add .
+    # 2. Identificar o nome do host pelo timestamp
+    # Procuramos arquivos que terminam com o formato: -YYYYMMDD-HHMMSS.nix
+    let pattern = '-\d{8}-\d{6}\.nix$'
+    
+    let flake_path = (ls $target | where name =~ $pattern | first | get name)
+    
+    if ($flake_path | is-empty) {
+        print "Erro: Nenhum arquivo com timestamp encontrado em /mnt/etc/nixos/"
+        return
     }
 
-    print $"Iniciando instalação do NixOS para o host: ($host_name)..."
+    # Extrai apenas o nome (stem) sem o caminho e sem a extensão .nix
+    let flake_name = ($flake_path | path parse | get stem)
 
-    # Executa a instalação apontando para o diretório atual (.) e o host
-    # O comando final será: nixos-install --flake .#nome-do-host
-    nixos-install --flake $".#($host_name)"
+    print $"Configuração dinâmica detectada: ($flake_name)"
+
+    # 3. Executar a instalação
+    cd $target
+    
+    # Se houver um repo git, o Nix exige o 'add' para enxergar novos arquivos
+    if (".git" | path exists) {
+        sudo git add .
+    }
+
+    print $"Iniciando nixos-install --flake .#($flake_name)..."
+    sudo nixos-install --flake $".#($flake_name)"
 }
