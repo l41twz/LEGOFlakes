@@ -30,6 +30,7 @@
 
       modules = [
         ./hardware-configuration.nix
+        ./disko.nix
         ({ pkgs, lib, config, ... }: {
           # =============================================
           # IDENTIDADE MÍNIMA DO HOST E USUÁRIO
