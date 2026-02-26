@@ -1,38 +1,37 @@
 #!/usr/bin/env nu
 
 def main [] {
-    let source = "/home/nixos/LEGOFlakes/flakes/"
     let target = "/mnt/etc/nixos/"
 
-    # 1. Cópia com privilégios de root
-    print "Copiando arquivos para /mnt/etc/nixos..."
-    sudo mkdir -p $target
-    sudo bash -c $"cp -r ($source)* ($target)"
-
-    # 2. Identificar o nome do host pelo timestamp
-    # Procuramos arquivos que terminam com o formato: -YYYYMMDD-HHMMSS.nix
+    # 1. Identificar o nome do host pelo timestamp
+    # Busca arquivos que terminam com o padrão: -YYYYMMDD-HHMMSS.nix
     let pattern = '-\d{8}-\d{6}\.nix$'
     
-    let flake_path = (ls $target | where name =~ $pattern | first | get name)
-    
-    if ($flake_path | is-empty) {
-        print "Erro: Nenhum arquivo com timestamp encontrado em /mnt/etc/nixos/"
+    # Lista os arquivos no destino e filtra pelo padrão
+    let found_files = (ls $target | where name =~ $pattern)
+
+    if ($found_files | is-empty) {
+        print $"Erro: Nenhum arquivo com timestamp encontrado em ($target)"
         return
     }
 
-    # Extrai apenas o nome (stem) sem o caminho e sem a extensão .nix
-    let flake_name = ($flake_path | path parse | get stem)
+    # Pega o primeiro arquivo encontrado e extrai o 'stem' (nome sem extensão)
+    let flake_name = ($found_files | first | get name | path parse | get stem)
 
     print $"Configuração dinâmica detectada: ($flake_name)"
 
-    # 3. Executar a instalação
+    # 2. Executar a instalação
+    # Entra no diretório para que o Nix reconheça o flake local (.)
     cd $target
     
-    # Se houver um repo git, o Nix exige o 'add' para enxergar novos arquivos
+    # O Nix exige que arquivos novos em um repo Git sejam 'staged'
     if (".git" | path exists) {
+        print "Repositório Git detectado, adicionando arquivos..."
         sudo git add .
     }
 
-    print $"Iniciando nixos-install --flake .#($flake_name)..."
+    print $"Iniciando instalação: nixos-install --flake .#($flake_name)"
+    
+    # Executa o comando final como root
     sudo nixos-install --flake $".#($flake_name)"
 }
