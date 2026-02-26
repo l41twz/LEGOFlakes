@@ -36,12 +36,13 @@ def main [] {
     # ── Limpa cache de avaliações anteriores ─────────────────────────────────
     sudo rm -rf /root/.cache/nix
 
-    # ── Redireciona o Nix store para o disco (evita esgotar o tmpfs da ISO) ──
-    # /mnt/nix já tem espaço; bind mount faz /nix da ISO apontar para ele.
-    let is_mounted = (sudo mountpoint -q /nix | complete | get exit_code) == 0
+    # ── Redireciona só o store para o disco ───────────────────────────────────
+    # Monta /mnt/nix/store sobre /nix/store — preserva o restante de /nix
+    # (incluindo os binários da ISO como sudo, nixos-install, etc.)
+    let is_mounted = (sudo mountpoint -q /nix/store | complete | get exit_code) == 0
     if not $is_mounted {
-        print "Redirecionando /nix para o disco..."
-        sudo mount --bind /mnt/nix /nix
+        print "Redirecionando /nix/store para o disco..."
+        sudo mount --bind /mnt/nix/store /nix/store
     }
 
     # ── Instala ───────────────────────────────────────────────────────────────
