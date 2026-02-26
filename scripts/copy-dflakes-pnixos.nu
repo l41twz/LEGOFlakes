@@ -4,18 +4,18 @@ def main [] {
     let source = "/home/nixos/LEGOFlakes/flakes/"
     let target = "/mnt/etc/nixos/"
 
-    # Garante que o diretório de destino existe
-    if not ($target | path exists) {
-        mkdir $target
-    }
+    print $"Solicitando permissões para gravar em ($target)..."
 
-    print $"Copiando conteúdo de ($source) para ($target)..."
-    
-    # No Nushell, usamos 'ls' para pegar os itens e 'cp' neles
-    # Ou passamos o caminho do diretório sem o asterisco se quisermos o conteúdo
-    ls $source | each { |it| 
-        cp -r $it.name $target 
-    }
+    # Garante que o diretório de destino existe com sudo
+    sudo mkdir -p $target
 
-    print "Arquivos copiados com sucesso!"
+    # No Nushell, para usar o wildcard (*) com sudo, 
+    # é mais seguro disparar uma subshell do bash ou usar o cp direto
+    sudo bash -c $"cp -r ($source)* ($target)"
+
+    if ($env.LAST_EXIT_CODE == 0) {
+        print "Arquivos copiados com sucesso como root!"
+    } else {
+        error make {msg: "Falha na cópia. Verifique a senha ou permissões."}
+    }
 }
