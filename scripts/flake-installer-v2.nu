@@ -2,23 +2,16 @@
 
 def main [] {
     let target = "/mnt/etc/nixos/"
-    let disk_cache = "/mnt/.cache-nix"
+    let fake_home = "/mnt/temp-home"
     let timestamp_pattern = '-\d{8}-\d{6}\.nix$'
 
-    # 1. Resolver o problema de espaço na RAM (Bind Mount)
-    print "Redirecionando cache da RAM para o disco real..."
-    sudo mkdir -p $disk_cache
-    sudo mkdir -p /root/.cache/nix
-    
-    # Monta a pasta do disco por cima da pasta de cache da RAM
-    # Isso faz com que os downloads pesados usem os 35GB do disco
-    sudo mount --bind $disk_cache /root/.cache/nix
+    # 1. Criar um "Home" falso no seu disco real (35GB livres)
+    # Isso evita usar o /home/nixos da RAM
+    print "Preparando espaço no disco real para cache e downloads..."
+    sudo mkdir -p $fake_home
+    sudo mkdir -p $"($fake_home)/cache"
 
-    # 2. Configurar variáveis de ambiente
-    $env.TMPDIR = "/mnt/tmp"
-    sudo mkdir -p /mnt/tmp
-
-    # 3. Localizar e preparar o flake.nix (mesma lógica anterior)
+    # 2. Localizar o arquivo e preparar o flake.nix
     let dynamic_file = (ls $target | where name =~ $timestamp_pattern | first | get name)
     
     if ($dynamic_file | is-empty) {
@@ -28,12 +21,14 @@ def main [] {
 
     let clean_hostname = ($dynamic_file | path parse | get stem | str replace -r '-\d{8}-\d{6}$' '')
     sudo cp $dynamic_file $"($target)flake.nix"
+    print $"Arquivo flake.nix criado para o host: ($clean_hostname)"
 
-    # 4. Executar a instalação
+    # 3. Executar a instalação redirecionando TUDO para o disco real
     cd $target
-    print $"Instalando host: ($clean_hostname) com cache em disco..."
     
-    # O --no-write-lock-file ajuda se o diretório estiver estranho, 
-    # mas o principal é o sudo -E para manter o TMPDIR
-    sudo -E nixos-install --flake $".#($clean_hostname)"
+    print "Iniciando instalação. O cache será gravado em /mnt/temp-home..."
+    
+    # O segredo está aqui: redirecionamos o HOME e o TMPDIR para o disco real
+    # Usamos sudo -E para que o instalador herde essas variáveis
+    sudo -E env HOME=$fake_home TMPDIR=$"($fake_home)/tmp" XDG_CACHE_HOME=$"($fake_home)/cache" nixos-install --flake $".#($clean_hostname)"
 }
