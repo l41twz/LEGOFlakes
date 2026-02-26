@@ -29,6 +29,7 @@
       };
 
       modules = [
+        ./hardware-configuration.nix
         ({ pkgs, lib, config, ... }: {
           # =============================================
           # IDENTIDADE MÍNIMA DO HOST E USUÁRIO
