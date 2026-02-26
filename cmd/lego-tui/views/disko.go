@@ -59,18 +59,19 @@ func (a diskoActionItem) FilterValue() string { return a.title }
 
 // ── Model ────────────────────────────────────────────────────
 type DiskoModel struct {
-	subState   diskoSubState
-	list       list.Model
-	actionList list.Model
-	input      textinput.Model
-	spinner    spinner.Model
-	rootDir    string
-	selected   string // Path of selected file
-	output     string
-	errMsg     string
-	width      int
-	height     int
-	message    string
+	subState    diskoSubState
+	list        list.Model
+	actionList  list.Model
+	input       textinput.Model
+	spinner     spinner.Model
+	rootDir     string
+	selected    string // Path of selected file
+	output      string
+	errMsg      string
+	width       int
+	height      int
+	message     string
+	isMountOnly bool
 }
 
 func NewDiskoModel(rootDir string) DiskoModel {
@@ -137,6 +138,7 @@ func (m *DiskoModel) Refresh() {
 func (m *DiskoModel) refreshActionList() {
 	actions := []list.Item{
 		diskoActionItem{title: "🚀 Executar Disko", desc: "Formatar e montar discos (PERIGOSO)"},
+		diskoActionItem{title: "💽 Montar Apenas", desc: "Apenas montar as unidades configuradas"},
 		diskoActionItem{title: "📝 Editar", desc: "Abrir no editor"},
 		diskoActionItem{title: "🗑️  Deletar", desc: "Remover arquivo permanentemente"},
 		diskoActionItem{title: "↩️  Voltar", desc: "Retornar à lista"},
@@ -247,6 +249,11 @@ func (m DiskoModel) updateAction(msg tea.Msg) (DiskoModel, tea.Cmd) {
 			if item, ok := m.actionList.SelectedItem().(diskoActionItem); ok {
 				switch item.title {
 				case "🚀 Executar Disko":
+					m.isMountOnly = false
+					m.subState = diskoSubConfirmRun
+					return m, nil
+				case "💽 Montar Apenas":
+					m.isMountOnly = true
 					m.subState = diskoSubConfirmRun
 					return m, nil
 				case "📝 Editar":
@@ -412,7 +419,12 @@ func (m DiskoModel) updateRun(msg tea.Msg) (DiskoModel, tea.Cmd) {
 
 func (m DiskoModel) runDisko() tea.Cmd {
 	return func() tea.Msg {
-		cmd := exec.Command("sudo", "nix", "run", "github:nix-community/disko", "--", "--mode", "disko", m.selected)
+		mode := "disko"
+		if m.isMountOnly {
+			mode = "mount"
+		}
+		// sudo nix run github:nix-community/disko -- --mode <mode> <file>
+		cmd := exec.Command("sudo", "nix", "run", "github:nix-community/disko", "--", "--mode", mode, m.selected)
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			return diskoResult{output: string(out), err: err}
@@ -442,6 +454,9 @@ func (m DiskoModel) HelpKeys() string {
 	case diskoSubConfirmDelete:
 		return "y: confirmar • n/esc: cancelar"
 	case diskoSubConfirmRun:
+		if m.isMountOnly {
+			return "y: MONTAR UNIDADES • n: cancelar"
+		}
 		return "y: DESTRUIR DADOS E FORMATAR • n: cancelar"
 	case diskoSubRun:
 		return "aguarde..."
@@ -478,15 +493,27 @@ func (m DiskoModel) View() string {
 		s = title + warn
 
 	case diskoSubConfirmRun:
-		title := styles.Subtitle.Render("PERIGO: formatar disco?")
 		fname := filepath.Base(m.selected)
-		warn := styles.ErrorStyle.Render(fmt.Sprintf(
-			"\n  ⚠️  ATENÇÃO: Isso irá DESTRUIR DADOS no disco configurado em '%s'.\n  Tem certeza absoluta?\\n", fname))
-		s = title + warn
+		if m.isMountOnly {
+			title := styles.Subtitle.Render("MONTAR DISCO?")
+			warn := styles.WarningStyle.Render(fmt.Sprintf(
+				"\n  ⚠️  Apenas montar as unidades configuradas em '%s'?\n  (Nenhum dado será deletado)\n", fname))
+			s = title + warn
+		} else {
+			title := styles.Subtitle.Render("PERIGO: formatar disco?")
+			warn := styles.ErrorStyle.Render(fmt.Sprintf(
+				"\n  ⚠️  ATENÇÃO: Isso irá DESTRUIR DADOS no disco configurado em '%s'.\n  Tem certeza absoluta?\n", fname))
+			s = title + warn
+		}
 
 	case diskoSubRun:
-		title := styles.Subtitle.Render("EXECUTANDO DISKO")
-		s = title + "\n\n  " + m.spinner.View() + " Formatando e montando..."
+		if m.isMountOnly {
+			title := styles.Subtitle.Render("MONTANDO DISCO")
+			s = title + "\n\n  " + m.spinner.View() + " Montando..."
+		} else {
+			title := styles.Subtitle.Render("EXECUTANDO DISKO")
+			s = title + "\n\n  " + m.spinner.View() + " Formatando e montando..."
+		}
 
 	case diskoSubResult:
 		title := styles.Subtitle.Render("RESULTADO")
