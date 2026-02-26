@@ -2,30 +2,39 @@
 
 def main [] {
     let target = "/mnt/etc/nixos/"
-    let disk_workdir = "/mnt/nix-workspace"
     let timestamp_pattern = '-\d{8}-\d{6}\.nix$'
 
-    print "Limpando lock files e caches corrompidos..."
-    if ($"($target)flake.lock" | path exists) { sudo rm -f $"($target)flake.lock" }
-    sudo rm -rf /root/.cache/nix
-    sudo rm -rf /home/nixos/.cache/nix
+    print "Expandindo os limites da RAM da ISO com Swap..."
+    
+    # 1. Magia do Swap e expansão do tmpfs via bash (garante estabilidade do sistema)
+    sudo bash -c "
+        if [ ! -f /mnt/iso_swap ]; then
+            echo 'Alocando 8GB no disco para suportar o nixpkgs-master...'
+            touch /mnt/iso_swap
+            # Previne erros no BTRFS, se for o caso
+            chattr +C /mnt/iso_swap 2>/dev/null || true
+            dd if=/dev/zero of=/mnt/iso_swap bs=1M count=8192 status=none
+            chmod 600 /mnt/iso_swap
+            mkswap /mnt/iso_swap
+            swapon /mnt/iso_swap
+        fi
+        echo 'Remontando partições na RAM para 12GB de limite virtual...'
+        mount -o remount,size=12G /nix/.rw-store
+        mount -o remount,size=12G /
+    "
 
-    sudo mkdir -p $"($disk_workdir)/cache"
-    sudo mkdir -p $"($disk_workdir)/tmp"
-
+    # 2. Preparar configuração
     let dynamic_file = (ls $target | where name =~ $timestamp_pattern | first | get name)
     if ($dynamic_file | is-empty) { print "Erro: Configuração não encontrada."; return }
-    
     let clean_hostname = ($dynamic_file | path parse | get stem | str replace -r '-\d{8}-\d{6}$' '')
     sudo cp -f $dynamic_file $"($target)flake.nix"
 
     cd $target
 
-    print "Gerando novo flake.lock limpo..."
-    sudo -E env TMPDIR=$"($disk_workdir)/tmp" XDG_CACHE_HOME=$"($disk_workdir)/cache" nix flake update
+    # Limpar possível lock file corrompido das tentativas anteriores
+    if ($"($target)flake.lock" | path exists) { sudo rm -f $"($target)flake.lock" }
 
-    print $"Instalando host: ($clean_hostname)..."
-    
-    # CORREÇÃO: Comando em uma única linha, sem a barra invertida (\)
-    sudo -E env TMPDIR=$"($disk_workdir)/tmp" XDG_CACHE_HOME=$"($disk_workdir)/cache" nixos-install --flake $".#($clean_hostname)" --option eval-cache false
+    # 3. Executar instalação limpa
+    print $"Iniciando instalação definitiva de: ($clean_hostname)..."
+    sudo nixos-install --flake $".#($clean_hostname)" --option eval-cache false
 }
