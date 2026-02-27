@@ -28,6 +28,7 @@ def main [] {
 
     # ── Git: necessário para o Nix resolver path: corretamente ───────────────
     cd $target
+    sudo git config --global --add safe.directory $target
     if not ($"($target)/.git" | path exists) {
         sudo git init
     }
@@ -46,6 +47,9 @@ def main [] {
     }
 
     # ── Instala ───────────────────────────────────────────────────────────────
+    print "Preparando diretórios temporários e de cache no disco alvo..."
+    sudo mkdir -p /mnt/.nix-tmp /mnt/.nix-cache
     print $"Instalando NixOS para o host: ($hostname)..."
-    sudo nixos-install --flake $".#($hostname)" --option eval-cache false
+    sudo env TMPDIR=/mnt/.nix-tmp XDG_CACHE_HOME=/mnt/.nix-cache nixos-install --flake $".#($hostname)" --option eval-cache false
+    sudo rm -rf /mnt/.nix-tmp /mnt/.nix-cache
 }
