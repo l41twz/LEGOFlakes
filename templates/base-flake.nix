@@ -4,10 +4,12 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
     {{FLAKE_INPUTS}}
   };
 
-  outputs = { self, nixpkgs, nixpkgs-master, {{FLAKE_OUTPUT_ARGS}}... }:
+  outputs = { self, nixpkgs, nixpkgs-master, disko, {{FLAKE_OUTPUT_ARGS}}... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -29,6 +31,7 @@
       };
 
       modules = [
+        disko.nixosModules.disko
         ./hardware-configuration.nix
         ./disko.nix
         ({ pkgs, lib, config, ... }: {
