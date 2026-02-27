@@ -46,11 +46,8 @@
             isNormalUser = true;
             initialPassword = "123456";
             description = "{{USER_DESCRIPTION}}";
-            extraGroups = [ "wheel" "networkmanager" "video" "input" ];
+            extraGroups = [ "wheel" "networkmanager" ];
           };
-
-          security.polkit.enable = true;
-          hardware.graphics.enable = true;
 
           time.timeZone = "{{TIMEZONE}}";
 
