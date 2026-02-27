@@ -433,7 +433,7 @@ func (m DiskoModel) runDisko() tea.Cmd {
 		destDir := "/mnt/etc/nixos"
 		exec.Command("sudo", "mkdir", "-p", destDir).Run()
 
-		destFile := filepath.Join(destDir, filepath.Base(m.selected))
+		destFile := filepath.Join(destDir, "disko.nix")
 		cpCmd := exec.Command("sudo", "cp", m.selected, destFile)
 		if cpOut, cpErr := cpCmd.CombinedOutput(); cpErr != nil {
 			return diskoResult{output: string(out) + "\nErro ao copiar para /mnt: " + string(cpOut), err: cpErr}
