@@ -3,7 +3,7 @@
 
 def main [] {
     print "Gerando configuração do NixOS em /mnt..."
-    sudo nixos-generate-config --root /mnt
+    sudo nixos-generate-config --no-filesystems --root /mnt
     
     let target_dir = "/mnt/etc/nixos"
     if ($target_dir | path exists) {
