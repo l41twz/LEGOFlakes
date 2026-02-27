@@ -31,8 +31,13 @@ def main [] {
     sudo git config --global --add safe.directory $target
     if not ($"($target)/.git" | path exists) {
         sudo git init
+        sudo git config user.email "livecd@nixos.org"
+        sudo git config user.name "LiveCD Installer"
     }
     sudo git add -A
+    try {
+        sudo git commit -m "Autocommit for flake evaluation" | ignore
+    }
 
     # ── Limpa cache de avaliações anteriores ─────────────────────────────────
     sudo rm -rf /root/.cache/nix
@@ -49,7 +54,21 @@ def main [] {
     # ── Instala ───────────────────────────────────────────────────────────────
     print "Preparando diretórios temporários e de cache no disco alvo..."
     sudo mkdir -p /mnt/.nix-tmp /mnt/.nix-cache
+    sudo chmod 777 /mnt/.nix-tmp /mnt/.nix-cache
+
+    print "Configurando daemon do Nix para evitar estouro da RAM..."
+    let override_dir = "/etc/systemd/system/nix-daemon.service.d"
+    sudo mkdir -p $override_dir
+    $"[Service]\nEnvironment=TMPDIR=/mnt/.nix-tmp\nEnvironment=XDG_CACHE_HOME=/mnt/.nix-cache\n" | sudo tee $"($override_dir)/override.conf" | ignore
+    sudo systemctl daemon-reload
+    sudo systemctl restart nix-daemon
+
     print $"Instalando NixOS para o host: ($hostname)..."
     sudo env TMPDIR=/mnt/.nix-tmp XDG_CACHE_HOME=/mnt/.nix-cache nixos-install --flake $".#($hostname)" --option eval-cache false
+    
+    print "Limpando e restaurando daemon do Nix..."
+    sudo rm -f $"($override_dir)/override.conf"
+    sudo systemctl daemon-reload
+    sudo systemctl restart nix-daemon
     sudo rm -rf /mnt/.nix-tmp /mnt/.nix-cache
 }
