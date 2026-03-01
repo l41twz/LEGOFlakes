@@ -3,3 +3,4 @@
 # CATEGORY: apps
 # ---
 programs.fish.enable = true;
+users.defaultUserShell = pkgs.fish;

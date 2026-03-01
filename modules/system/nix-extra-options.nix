@@ -1,4 +1,4 @@
-# NIXOS-LEGO-MODULE: nix-settings
+# NIXOS-LEGO-MODULE: nix-extra-options
 # PURPOSE: Nix daemon options with flakes and parallel builds
 # CATEGORY: system
 # ---

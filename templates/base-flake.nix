@@ -44,7 +44,7 @@
 
           users.users."{{USER_NAME}}" = {
             isNormalUser = true;
-            initialPassword = "123456";
+            initialPassword = "{{USER_INITIALPASSWORD}}";
             description = "{{USER_DESCRIPTION}}";
             extraGroups = [ "wheel" "networkmanager" ];
           };

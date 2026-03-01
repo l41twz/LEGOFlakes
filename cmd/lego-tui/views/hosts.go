@@ -11,6 +11,12 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+// ManageModulesMsg is emitted when the user wants to manage modules for a preset
+type ManageModulesMsg struct {
+	PresetName string
+	Modules    []string
+}
+
 // ── List item adapter ────────────────────────────────────────
 type presetItem struct {
 	info     engine.PresetInfo
@@ -111,10 +117,11 @@ func (m *HostsModel) refreshList() {
 
 func (m *HostsModel) refreshActionList() {
 	actions := []list.Item{
-		simpleItem{title: "✅ Escolher Preset", desc: "Definir como ativo para build"},
+		simpleItem{title: "✅ Escolher Preset", desc: "Carrega o Preset limpo de módulos"},
+		simpleItem{title: "🧩 Gerenciar Módulos", desc: "Carrega o Preset completo com todos os módulos"},
 		simpleItem{title: "📝 Editar Preset", desc: "Abrir no editor"},
-		simpleItem{title: "🗑️  Deletar Preset", desc: "Remover permanentemente"},
-		simpleItem{title: "↩️  Voltar", desc: "Retornar à lista"},
+		simpleItem{title: "🗑️ Deletar Preset", desc: "Remover permanentemente"},
+		simpleItem{title: "↩️ Voltar", desc: "Retornar à lista"},
 	}
 	delegate := list.NewDefaultDelegate()
 	delegate.Styles.SelectedTitle = delegate.Styles.SelectedTitle.
@@ -233,6 +240,25 @@ func (m HostsModel) updateAction(msg tea.Msg) (HostsModel, tea.Cmd) {
 					m.subState = hostSubList
 					m.refreshList()
 					return m, nil
+				case "🧩 Gerenciar Módulos":
+					// Load preset and emit message with its active modules
+					path := fmt.Sprintf("%s/%s.toml", m.presetsDir, m.selected)
+					preset, err := engine.LoadPreset(path)
+					if err != nil {
+						m.message = "Erro ao carregar preset: " + err.Error()
+						m.subState = hostSubList
+						return m, nil
+					}
+					m.activePreset = m.selected
+					m.message = fmt.Sprintf("🧩 Módulos de '%s' carregados na aba Seleção", m.selected)
+					m.subState = hostSubList
+					m.refreshList()
+					return m, func() tea.Msg {
+						return ManageModulesMsg{
+							PresetName: m.selected,
+							Modules:    preset.Modules.Active,
+						}
+					}
 				case "🗑️  Deletar Preset":
 					path := fmt.Sprintf("%s/%s.toml", m.presetsDir, m.selected)
 					if err := deletePresetFile(path); err != nil {

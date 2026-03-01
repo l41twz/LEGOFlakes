@@ -1,8 +1,8 @@
-# NIXOS-LEGO-MODULE: xkb-layout-br
+# NIXOS-LEGO-MODULE: keyboard-layout-xkb-ptbr
 # PURPOSE: Brazilian ABNT2 keyboard layout for X11
 # CATEGORY: system
 # ---
 services.xserver.xkb = {
   layout = "br";
-  variant = "";
+  variant = "abnt2";
 };

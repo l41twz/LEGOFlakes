@@ -17,6 +17,7 @@ environment.systemPackages = with pkgs; [
   bottom
   macchina
   systemctl-tui
-  gum
   fastfetch
+  usbutils
+  pciutils
 ];

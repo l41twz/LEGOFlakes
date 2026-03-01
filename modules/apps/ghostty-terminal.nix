@@ -5,3 +5,7 @@
 environment.systemPackages = with pkgs; [
   ghostty
 ];
+
+environment.etc."xdg/ghostty/config".text = ''
+  font-family = "FiraCode Nerd Font"
+'';

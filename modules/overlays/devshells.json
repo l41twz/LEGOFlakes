@@ -18,6 +18,6 @@
       "lapce",
       "fish"
     ],
-    "shellHook": "echo '🔧 Ambiente dev-tools ativado com sucesso!'\nexec fish"
+    "shellHook": "# 1. Libera o acesso/visibilidade das pastas via variáveis de ambiente\nexport ANTIGRAVITY_CONFIG_DIR=\"$HOME/.config/antigravity\"\nexport ANTIGRAVITY_HOME=\"$HOME/.antigravity\"\nexport GEMINI_CONFIG_DIR=\"$HOME/.gemini\"\n\n# 2. Garante que o XDG (padrão Linux) aponte para sua home real\nexport XDG_CONFIG_HOME=\"$HOME/.config\"\nexport XDG_DATA_HOME=\"$HOME/.local/share\"\nexport XDG_STATE_HOME=\"$HOME/.local/state\"\n\n# 3. Extra: Resolve o problema do 'safe.directory' que você mencionou\n# Isso permite que o Git opere dentro da pasta /etc/nixos sem reclamar\ngit config --global --add safe.directory /etc/nixos\necho '🔧 Ambiente dev-tools ativado com sucesso!'\nexec fish"
   }
 ]

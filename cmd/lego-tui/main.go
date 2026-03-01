@@ -14,24 +14,24 @@ import (
 // Tab indices
 const (
 	tabIntro     = 0
-	tabHosts     = 1
-	tabModules   = 2
-	tabSelection = 3
-	tabBuilder   = 4
-	tabInstaller = 5
-	tabScripts   = 6
-	tabDisko     = 7
+	tabDisko     = 1
+	tabHosts     = 2
+	tabModules   = 3
+	tabSelection = 4
+	tabBuilder   = 5
+	tabInstaller = 6
+	tabScripts   = 7
 )
 
 var tabNames = []string{
 	"Início",
+	"Disko",
 	"Hosts",
 	"Módulos",
 	"Seleção",
 	"Gerar",
 	"Aplicar",
 	"Scripts",
-	"Disko",
 }
 
 type model struct {
@@ -189,6 +189,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
+	// Handle ManageModulesMsg globally — switch to Selection tab with preset modules loaded
+	if mmMsg, ok := msg.(views.ManageModulesMsg); ok {
+		m.selection.Refresh()
+		m.selection.LoadFromPreset(mmMsg.Modules)
+		m.activeTab = tabSelection
+		return m, nil
+	}
+
 	// Delegate to active tab
 	var cmd tea.Cmd
 	switch m.activeTab {
@@ -204,7 +212,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if msg.String() == "enter" {
 				presetName := m.hosts.SelectedPreset()
 				modules := m.selection.GetSelected()
-				if presetName != "" && len(modules) > 0 {
+				if presetName == "" || len(modules) == 0 {
+					break
+				}
+
+				if m.builder.IsMenu() {
+					// Menu confirmed
+					switch m.builder.MenuCursor() {
+					case 0: // Gerar Flake → go to name input
+						cmd = m.builder.GoToNameInput()
+						return m, cmd
+					case 1: // Salvar Preset → save directly
+						cmd = m.builder.SavePresetOnly(presetName, m.presetsDir, modules)
+						return m, cmd
+					}
+				} else if m.builder.IsNameInput() {
+					// Name input confirmed → build flake
 					cmd = m.builder.StartBuild(presetName, m.presetsDir, modules)
 					return m, cmd
 				}

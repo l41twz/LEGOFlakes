@@ -149,3 +149,11 @@ func (m SelectionModel) GetSelected() []string {
 func (m *SelectionModel) Refresh() {
 	m.modules = engine.ListModules(m.rootDir)
 }
+
+// LoadFromPreset pre-selects modules listed in the preset's active list
+func (m *SelectionModel) LoadFromPreset(activeModules []string) {
+	m.selected = make(map[string]bool)
+	for _, mod := range activeModules {
+		m.selected[mod] = true
+	}
+}

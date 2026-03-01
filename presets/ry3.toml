@@ -1,12 +1,12 @@
 [host]
-  preset_name = "vm"
-  host_name = "vm"
+  preset_name = "ry3"
+  host_name = "ry3"
   state_version = "26.05"
 
 [user]
-  name = "vm"
+  name = "ry3"
   initialPassword = "123456"
-  description = "user/git-user <email@provider>"
+  description = "l41twz <253585242+l41twz@users.noreply.github.com>"
 
 [locale]
   timezone = "America/Sao_Paulo"
@@ -23,9 +23,9 @@
   keymap = "br-abnt2"
 
 [modules]
-  active = []
+  active = ["system/kernel-xanmod", "system/nerd-fonts"]
 
 [metadata]
-  created_at = "2026-02-28T21:21:47Z"
-  last_modified = "2026-02-28T21:21:47Z"
-  last_applied_flake = ""
+  created_at = "2026-02-28T20:41:24Z"
+  last_modified = "2026-02-28T21:35:41Z"
+  last_applied_flake = "ry3-s.nix"

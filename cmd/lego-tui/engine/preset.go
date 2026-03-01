@@ -25,8 +25,9 @@ type HostConfig struct {
 }
 
 type UserConfig struct {
-	Name        string `toml:"name"`
-	Description string `toml:"description"`
+	Name            string `toml:"name"`
+	Initialpassword string `toml:"initialPassword"`
+	Description     string `toml:"description"`
 }
 
 type LocaleConfig struct {
@@ -112,8 +113,9 @@ func NewDefaultPreset(name, userName string) *Preset {
 			StateVersion: "26.05",
 		},
 		User: UserConfig{
-			Name:        userName,
-			Description: userName,
+			Name:            userName,
+			Initialpassword: "123456",
+			Description:     "user <email@provider>",
 		},
 		Locale: LocaleConfig{
 			Timezone:         "America/Sao_Paulo",
