@@ -6,11 +6,12 @@ programs.git = {
   enable = true;
   config = {
     user = {
-    name = "git-username";
-    email = "git-email";
+    name = "l41twz";
+    email = "253585242+l41twz@users.noreply.github.com";
     };
     # Optional: Safe directory global configuration
     safe = {
       directory = "*";
       };
     };
+  };

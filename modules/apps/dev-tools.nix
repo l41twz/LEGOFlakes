@@ -7,7 +7,7 @@ environment.systemPackages = with pkgs; [
   wget
   curl
   tmux
-  pkgs-master.vscode
+  vscode
   pkgs-master.antigravity
   pkgs-master.mcp-nixos
   nil

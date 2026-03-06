@@ -198,31 +198,34 @@ func BuildFlake(root string, preset *Preset, modules []string, customName string
 		moduleContent.WriteString(indent + "})\n")
 	}
 
-	// Replace placeholders
+	// Inject snippets and module content first
 	flake := string(tmpl)
+	flake = strings.ReplaceAll(flake, "{{MODULE_INJECTION_POINT}}", moduleContent.String())
+	flake = strings.ReplaceAll(flake, "{{DEVSHELLS_INJECTION}}", devShellsSnippet)
+	flake = strings.ReplaceAll(flake, "{{FLAKE_INPUTS}}", flakeInputsSnippet)
+	flake = strings.ReplaceAll(flake, "{{FLAKE_OUTPUT_ARGS}}", flakeOutputArgs)
+	flake = strings.ReplaceAll(flake, "{{FLAKE_SPECIAL_ARGS}}", flakeSpecialArgs)
+
+	// Replace preset configuration placeholders everywhere
 	replacements := map[string]string{
-		"{{PRESET_NAME}}":            preset.Host.PresetName,
-		"{{HOST_NAME}}":              preset.Host.HostName,
-		"{{STATE_VERSION}}":          preset.Host.StateVersion,
-		"{{USER_NAME}}":              preset.User.Name,
-		"{{USER_DESCRIPTION}}":       preset.User.Description,
-		"{{TIMEZONE}}":               preset.Locale.Timezone,
-		"{{DEFAULT_LOCALE}}":         preset.Locale.DefaultLocale,
-		"{{LC_ADDRESS}}":             preset.Locale.LcAddress,
-		"{{LC_IDENTIFICATION}}":      preset.Locale.LcIdentification,
-		"{{LC_MEASUREMENT}}":         preset.Locale.LcMeasurement,
-		"{{LC_MONETARY}}":            preset.Locale.LcMonetary,
-		"{{LC_NAME}}":                preset.Locale.LcName,
-		"{{LC_NUMERIC}}":             preset.Locale.LcNumeric,
-		"{{LC_PAPER}}":               preset.Locale.LcPaper,
-		"{{LC_TELEPHONE}}":           preset.Locale.LcTelephone,
-		"{{LC_TIME}}":                preset.Locale.LcTime,
-		"{{KEYMAP}}":                 preset.Locale.Keymap,
-		"{{FLAKE_INPUTS}}":           flakeInputsSnippet,
-		"{{FLAKE_OUTPUT_ARGS}}":      flakeOutputArgs,
-		"{{FLAKE_SPECIAL_ARGS}}":     flakeSpecialArgs,
-		"{{DEVSHELLS_INJECTION}}":    devShellsSnippet,
-		"{{MODULE_INJECTION_POINT}}": moduleContent.String(),
+		"{{PRESET_NAME}}":          preset.Host.PresetName,
+		"{{HOST_NAME}}":            preset.Host.HostName,
+		"{{STATE_VERSION}}":        preset.Host.StateVersion,
+		"{{USER_NAME}}":            preset.User.Name,
+		"{{USER_INITIALPASSWORD}}": preset.User.Initialpassword,
+		"{{USER_DESCRIPTION}}":     preset.User.Description,
+		"{{TIMEZONE}}":             preset.Locale.Timezone,
+		"{{DEFAULT_LOCALE}}":       preset.Locale.DefaultLocale,
+		"{{LC_ADDRESS}}":           preset.Locale.LcAddress,
+		"{{LC_IDENTIFICATION}}":    preset.Locale.LcIdentification,
+		"{{LC_MEASUREMENT}}":       preset.Locale.LcMeasurement,
+		"{{LC_MONETARY}}":          preset.Locale.LcMonetary,
+		"{{LC_NAME}}":              preset.Locale.LcName,
+		"{{LC_NUMERIC}}":           preset.Locale.LcNumeric,
+		"{{LC_PAPER}}":             preset.Locale.LcPaper,
+		"{{LC_TELEPHONE}}":         preset.Locale.LcTelephone,
+		"{{LC_TIME}}":              preset.Locale.LcTime,
+		"{{KEYMAP}}":               preset.Locale.Keymap,
 	}
 	for k, v := range replacements {
 		flake = strings.ReplaceAll(flake, k, v)

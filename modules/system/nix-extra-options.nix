@@ -3,7 +3,7 @@
 # CATEGORY: system
 # ---
 nix.extraOptions = ''
-  max-jobs = 6
-  cores = 6
+  max-jobs = auto
+  cores = 0
   experimental-features = nix-command flakes
 '';

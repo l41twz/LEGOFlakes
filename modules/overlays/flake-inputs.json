@@ -12,5 +12,12 @@
     "arg": "nix-gaming-pkgs",
     "attr": "packages.${system}",
     "follows_nixpkgs": true
+  },
+  {
+    "name": "nix-cachyos-kernel",
+    "url": "github:xddxdd/nix-cachyos-kernel/release",
+    "arg": "cachyos-kernel-overlays",
+    "attr": "overlays",
+    "follows_nixpkgs": false
   }
 ]
