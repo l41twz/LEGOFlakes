@@ -1,59 +1,37 @@
 # NixOS LEGO System Builder 🧱
 
-Um construtor de configurações NixOS moderno e modular, projetado para clareza e eficiência. Monte seu setup NixOS como LEGO usando módulos atômicos e uma TUI (Interface de Terminal) intuitiva.
+Um construtor de configurações NixOS moderno e modular, projetado para clareza e eficiência. Monte seu sistema NixOS como blocos de LEGO usando módulos atômicos, layouts de disco declarativos (Disko) e uma TUI (Interface de Terminal) interativa e intuitiva.
 
 ## ✨ Principais Funcionalidades
 
-- **🚀 TUI em Go**: Uma interface interativa rápida e responsiva construída com Bubble Tea.
-- **🧩 Arquitetura Modular**: Módulos atômicos "Zero-Header" que tornam a reutilização de configurações sem esforço.
-- **🛠️ Sistema de Presets Automatizado**: Defina hosts e configurações de usuário via arquivos `.toml` simples.
-- **💾 Integração com Disko**: Ferramentas de particionamento de disco integradas para instalações fáceis.
-- **🔗 Flake Inputs Dinâmicos**: Declare flakes externos em um único JSON — sem editar o builder ou template.
-- **🤖 Assistência de IA**: Integração profunda com Gemini para assistência no editor e ajuda na configuração.
-- **🐚 Orquestração com Nushell**: Utiliza scripts shell modernos para operações de backend robustas.
+- **🚀 TUI em Go**: Uma interface interativa super rápida construída com Bubble Tea para selecionar seus módulos, configurar o sistema e compilar seu Flake com facilidade.
+- **🧩 Arquitetura Modular ("Zero-Header")**: Módulos atômicos focados unicamente na declaração. Chega de cabeçalhos complexos – a TUI agrupa os módulos em uma configuração válida automaticamente.
+- **🛠️ Sistema de Presets via TOML**: Salve perfis completos de hosts e usuários em arquivos `.toml` simples. Personalize sua build em segundos.
+- **💾 Integração Profunda com Disko**: Layouts prontos para uso em diferentes cenários (`nvme.nix`, `sda.nix`, `vda.nix` para VMs).
+- **🤖 Ecossistema e Assistência de IA**: Suporte nativo e documentado para rodar um hub de IA local (Ollama com modelos Llama/Qwen) e criar um segundo cérebro inteligente usando Khoj integrado ao Obsidian. Assistência de IA estendida até o seu CLI/Editor (Micro + Gemini).
+- **🐚 Orquestração e Instalação em Nushell**: Scripts poderosos e legíveis para lidar com o particionamento, formatação, cópia das configurações e instalação final do NixOS no hardware.
+- **💿 Geração de ISO Customizada**: Construa sua própria ISO live no diretório `iso/` para hospedar suas ferramentas favoritas antes mesmo de instalar o sistema.
 
-## 🛠️ Instalação e Configuração
+## 📐 Arquitetura do Projeto
 
-### Pré-requisitos
-- [Nix](https://nixos.org/download.html) (com Flakes habilitados)
-- [Go](https://go.dev/) (para compilar a TUI)
-- [Nushell](https://www.nushell.sh/)
-
-### Início Rápido
-```bash
-# Clone o repositório
-git clone https://github.com/l41twz/LEGOFlakes.git
-cd LEGOFlakes
-
-# Compile a LEGO TUI
-go build -o lego-tui ./cmd/lego-tui
-
-# Configuração inicial (instala plugins do editor e prepara o ambiente)
-nu scripts/prepare.nu
-
-# Inicie a interface
-./lego-tui
-```
-
-## 📐 Arquitetura
-
-O projeto é estruturado para separar a lógica da configuração:
+O projeto é estruturado de forma a separar estritamente o motor de geração das peças de configuração:
 
 ```text
-├── cmd/lego-tui/      # Código fonte da TUI interativa em Go
-├── modules/           # Módulos NixOS atômicos (sistema, hardware, apps, etc.)
-├── flake-inputs.json  # Declaração de flakes externos (zen-browser, etc.)
-├── presets/           # Configurações específicas de host (.toml)
-├── scripts/           # Scripts de automação em Nushell
-├── secrets/           # Arquivos de configuração de segredo
-├── flakes/            # Saídas de Flakes geradas
-└── templates/         # Templates Nix base usados para geração
+├── cmd/lego-tui/      # Motor e código fonte da TUI interativa (Go)
+├── config/            # Configurações de ferramentas como o Micro editor e plugins
+├── disko/             # Layouts declarativos de disco prontos para uso (nvme, sda, vda)
+├── flakes/            # Extensões e Flakes gerados pelo lego-tui
+├── iso/               # Módulos para geração de Live ISO do NixOS
+├── modules/           # As "peças de LEGO": módulos de sistema, apps, hardware, etc.
+├── presets/           # Perfis de Host em modo TOML
+├── scripts/           # Scripts core em Nushell (#1, #2, #3) para formatação e instalação
+└── templates/         # Template base usado como alicerce do motor de Flake
 ```
 
 ### O Conceito de Módulo "Zero-Header"
-Os módulos no LEGOFlakes são projetados para serem trechos puros de Nix. Sem cabeçalhos de função, sem imports — apenas a configuração bruta. O construtor envolve automaticamente esses trechos em módulos Nix válidos durante o processo de geração do Flake.
+Os módulos no LEGOFlakes são recortes puros de código Nix. Sem cabeçalhos engessados ou declarações de importação — apenas a configuração bruta e identificadores do TUI comentados.
 
-Exemplo em `modules/hardware/bluetooth.nix`:
+Exemplo de `modules/hardware/bluetooth.nix`:
 ```nix
 # NIXOS-LEGO-MODULE: bluetooth-core
 # PURPOSE: Enable bluetooth services and GUI
@@ -63,20 +41,50 @@ hardware.bluetooth.enable = true;
 services.blueman.enable = true;
 ```
 
-## 🚀 Fluxo de Trabalho
+## 🛠️ Instalação em Novo Hardware (Nova Abordagem)
 
-1. **Seleção de Host**: Escolha ou crie um preset de host (arquitetura, usuário, timezone).
-2. **Seleção de Componentes**: Selecione módulos interativamente entre categorias (Sistema, Hardware, Apps, Serviços).
-3. **Build**: Gere um `flake.nix` completo concatenando os módulos selecionados nos templates.
-4. **Deploy**: Visualize as mudanças com um visualizador de diff integrado e aplique usando `nixos-rebuild`.
+O sistema conta com um novo instalador modular usando scripts `nu` de instalação direta para um novo NixOS. 
 
-## 🤖 Integração com Editor
+### Pré-requisitos Iniciais
+- Uma ISO Live qualquer do NixOS ou a ISO compilada de `/iso` (com Flakes e Nushell)
+- Conexão com internet
+- Partição e disco definidos (Verifique `lsblk` para usar `/dev/nvme0n1` ou `/dev/sda`)
 
-Recomendamos o uso do editor **Micro** com nosso plugin customizado **Gemini** (localizado em `config/micro`). Isso permite:
-- Obter ajuda de IA enquanto edita os módulos.
-- Formatar código Nix automaticamente.
-- Gerenciar chaves de API com segurança através de `nu scripts/gemini-key.nu`.
+### Passo a Passo
+
+1. **Clone do Repositório (no Live USB):**
+```bash
+git clone https://github.com/l41twz/LEGOFlakes.git
+cd LEGOFlakes
+```
+
+2. **Formatação e Estruturação Disko (#1):**
+Executa seu layout Disko escolhido e monta em `/mnt`.
+```bash
+sudo nu scripts/#1-prepare.nu
+```
+
+3. **Cópia do Projeto (#2):**
+Move o blueprint do seu sistema para a área de instalação local antes mesmo do NixOS existir.
+```bash
+sudo nu scripts/#2-copy-dflakes-pnixos.nu
+```
+
+4. **Instalação do Sistema (#3):**
+Realiza a detecção, criação automática de arquivos finais como base e finaliza a geração do Flake no disco do host.
+```bash
+sudo nu scripts/#3-flake-installer-v2.nu
+```
+
+## 🤖 Integração com Editor (Micro + Gemini)
+
+Projetamos um fluxo em  `config/micro` que injeta o Google Gemini direto na edição de texto.
+Essa funcionalidade possibilita pedir ao Gemini para codar pedaços inteiros, ou avaliar a semântica Nix de um módulo enquanto você constrói o sistema.
+
+1. Instale e configure o token com `nu scripts/gemini-key.nu`
+2. Utilize o atalho ou comando no Micro para acionar `config/micro/gemini-query.nu`.
 
 ## 📜 Licença
 
-Este projeto é licenciado sob a Licença MIT - consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+Desenvolvido para uso pessoal, estudos em NixOS, e experimentações em automação com TUI/Go. 
+Este projeto é licenciado sob a Licença MIT - consulte o arquivo `LICENSE` para mais detalhes.
