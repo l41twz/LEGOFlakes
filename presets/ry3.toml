@@ -23,9 +23,9 @@
   keymap = "br-abnt2"
 
 [modules]
-  active = ["apps/mission-center", "apps/cli-utils", "services/ssh-server", "system/nix-extra-options", "system/udev-rules", "apps/git-config", "apps/fish-shell", "apps/zen-browser", "overlays/kde-overlay", "system/wayland-base", "system/zram-swap", "hardware/gpu-amd", "services/ollama-ai-amd", "system/systemd-boot", "hardware/pipewire-audio", "services/firewall-ports", "system/kernel-xanmod", "hardware/cpu-amd", "system/nerd-fonts", "hardware/bluetooth", "services/docker-engine", "apps/obsidian", "apps/pods", "system/gaming-sysctl", "overlays/allow-unfree", "system/systemd-tweaks", "services/khoj", "apps/dev-tools", "hardware/keyboard-layout-xkb-ptbr", "apps/plasma6-desktop", "system/systemd-optimize", "apps/obsidian-khoj", "system/ssh-agent-git"]
+  active = ["hardware/keyboard-layout-xkb-ptbr", "system/systemd-optimize", "system/udev-rules", "apps/fish-shell", "system/systemd-boot", "apps/pods", "system/gaming-sysctl", "apps/wave-terminal", "apps/mission-center", "overlays/kde-overlay", "hardware/cpu-amd", "apps/obsidian-khoj", "system/ssh-agent-git", "apps/cli-utils", "services/ollama-ai-amd", "hardware/pipewire-audio", "apps/plasma6-desktop", "apps/noctalia-shell", "system/kernel-xanmod", "system/nerd-fonts", "apps/mangowc-compositor", "system/systemd-tweaks", "services/khoj", "system/nix-extra-options", "apps/git-config", "apps/zen-browser", "services/firewall-ports", "system/wayland-base", "system/zram-swap", "hardware/gpu-amd", "apps/obsidian", "hardware/bluetooth", "overlays/allow-unfree", "apps/dev-tools", "services/ssh-server", "services/docker-engine"]
 
 [metadata]
   created_at = "2026-02-28T20:41:24Z"
-  last_modified = "2026-03-06T20:42:25Z"
-  last_applied_flake = "ry3-20260306-174225.nix"
+  last_modified = "2026-03-09T19:17:43Z"
+  last_applied_flake = "ry3-20260309-161743.nix"
