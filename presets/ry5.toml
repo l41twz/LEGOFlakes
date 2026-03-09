@@ -23,9 +23,9 @@
   keymap = "br-abnt2"
 
 [modules]
-  active = ["hardware/corsair-ckb-next", "hardware/gpu-nvidia-pascal", "apps/wave-terminal", "apps/mangowc-compositor", "system/zram-swap", "apps/obsidian", "services/ollama-ai-nvidia", "hardware/keyboard-layout-xkb-ptbr", "system/gaming-sysctl", "system/ssh-agent-git", "services/firewall-ports", "system/wayland-base", "overlays/mangowc-overlay", "apps/nemo-filemanager", "apps/mission-center", "hardware/pipewire-audio", "apps/noctalia-shell", "system/udev-rules", "system/systemd-boot", "system/systemd-tweaks", "hardware/bluetooth", "system/kernel-cachyos", "hardware/cpu-amd", "system/nerd-fonts", "services/ssh-server", "apps/obsidian-khoj", "apps/cli-utils", "apps/dev-tools", "services/docker-engine", "system/systemd-optimize", "services/khoj", "system/nix-extra-options", "apps/git-config", "apps/zen-browser", "overlays/allow-unfree"]
+  active = ["services/docker-engine", "overlays/allow-unfree", "system/udev-rules", "system/systemd-tweaks", "system/nerd-fonts", "apps/cli-utils", "system/nix-extra-options", "apps/obsidian", "services/firewall-ports", "hardware/pipewire-audio", "apps/obsidian-khoj", "apps/zen-browser", "hardware/gpu-nvidia-pascal", "system/ssh-agent-git", "system/wayland-base", "apps/mission-center", "system/kernel-cachyos", "hardware/cpu-amd", "services/ollama-ai-nvidia", "system/systemd-optimize", "services/khoj", "apps/wave-terminal", "hardware/keyboard-layout-xkb-ptbr", "apps/nemo-filemanager", "services/ssh-server", "apps/git-config", "system/zram-swap", "apps/dev-tools", "apps/noctalia-niri", "hardware/corsair-ckb-next", "system/gaming-sysctl", "system/systemd-boot", "hardware/bluetooth"]
 
 [metadata]
   created_at = "2026-02-28T20:41:24Z"
-  last_modified = "2026-03-09T20:52:30Z"
+  last_modified = "2026-03-09T22:01:12Z"
   last_applied_flake = "ry3-20260309-161743.nix"

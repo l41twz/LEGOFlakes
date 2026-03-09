@@ -1,5 +1,5 @@
-# NIXOS-LEGO-MODULE: mangowc-compositor
-# PURPOSE: MangoWC tiling Wayland compositor (dwm-like) with XWayland
+# NIXOS-LEGO-MODULE: noctalia-mango
+# PURPOSE: MangoWC compositor + Noctalia shell integrated desktop pack
 # CATEGORY: apps
 # ---
 programs.xwayland.enable = true;
@@ -24,7 +24,10 @@ environment.systemPackages = with pkgs; [
   mako
   swaylock
   foot
-];
+] ++ (with pkgs-master; [
+  noctalia-shell
+  quickshell
+]);
 
 environment.sessionVariables = {
   NIXOS_OZONE_WL = "1";
@@ -34,7 +37,10 @@ environment.sessionVariables = {
   XDG_CURRENT_DESKTOP = "mango";
 };
 
-# Default MangoWC config — keybindings, appearance, and autostart
+# Calendar events support via evolution-data-server (for Noctalia)
+services.gnome.evolution-data-server.enable = true;
+
+# Default MangoWC config with keybindings and Noctalia autostart
 environment.etc."mango/config.conf".text = ''
   # Window effect
   blur=0
@@ -251,7 +257,7 @@ environment.etc."mango/config.conf".text = ''
   layerrule=animation_type_open:zoom,layer_name:rofi
   layerrule=animation_type_close:zoom,layer_name:rofi
 
-  # Autostart — launch Noctalia shell and notification daemon
+  # Autostart — Noctalia shell and notification daemon
   exec-once=noctalia-shell
   exec-once=mako
 '';

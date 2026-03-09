@@ -17,8 +17,7 @@ xdg.portal = {
   ];
 };
 
-environment.systemPackages = with pkgs-master; [
-  niri
+environment.systemPackages = with pkgs; [
   swaylock
   fuzzel
   mako
@@ -27,6 +26,7 @@ environment.systemPackages = with pkgs-master; [
   grim
   slurp
   swappy
+  foot
 ];
 
 # Session env vars for Wayland
@@ -36,4 +36,5 @@ environment.sessionVariables = {
   QT_QPA_PLATFORM = "wayland";
   SDL_VIDEODRIVER = "wayland";
   XDG_SESSION_TYPE = "wayland";
+  XDG_CURRENT_DESKTOP = "niri";
 };
