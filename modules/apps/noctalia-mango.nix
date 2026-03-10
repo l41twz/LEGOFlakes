@@ -177,6 +177,18 @@ environment.etc."mango/config.conf".text = ''
   tagrule=id:8,layout_name:tile
   tagrule=id:9,layout_name:tile
 
+  # Core binds
+  bind=SUPER,space,spawn,noctalia-shell ipc call launcher toggle
+  bind=SUPER,s,spawn,noctalia-shell ipc call controlCenter toggle
+  bind=SUPER,comma,spawn,noctalia-shell ipc call settings toggle
+
+  # Media keys
+  bind=NONE,XF86AudioRaiseVolume,spawn,noctalia-shell ipc call volume increase
+  bind=NONE,XF86AudioLowerVolume,spawn,noctalia-shell ipc call volume decrease
+  bind=NONE,XF86AudioMute,spawn,noctalia-shell ipc call volume muteOutput
+  bind=NONE,XF86MonBrightnessUp,spawn,noctalia-shell ipc call brightness increase
+  bind=NONE,XF86MonBrightnessDown,spawn,noctalia-shell ipc call brightness decrease
+
   # Key Bindings
   bind=SUPER,r,reload_config
   bind=Alt,space,spawn,fuzzel
