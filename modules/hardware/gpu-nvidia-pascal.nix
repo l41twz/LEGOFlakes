@@ -47,8 +47,8 @@ hardware.graphics = {
 
 hardware.opengl = {
   enable = true;
-  driSupport = true;
-  driSupport32Bit = true;   # essencial pra emuladores 32-bit
+  #driSupport = true;
+  #driSupport32Bit = true;   # essencial pra emuladores 32-bit
 };
 
 environment.systemPackages = with pkgs; [

@@ -5,8 +5,9 @@
 services.ollama = {
   enable = true;
 
+  package = pkgs.ollama-cuda;
   # Aceleração nativa via CUDA para placas de vídeo NVIDIA
-  acceleration = "cuda";
+  # acceleration = "cuda";
 
   port = 11434;
   host = "0.0.0.0"; # Permite comunicação via host gateway para contêineres Docker
