@@ -179,8 +179,8 @@ environment.etc."mango/config.conf".text = ''
 
   # Core binds
   bind=SUPER,space,spawn,noctalia-shell ipc call launcher toggle
-  bind=SUPER,s,spawn,noctalia-shell ipc call controlCenter toggle
-  bind=SUPER,comma,spawn,noctalia-shell ipc call settings toggle
+  bind=SUPER,backslash,spawn,noctalia-shell ipc call controlCenter toggle
+  bind=SUPER+SHIFT,backslash,spawn,noctalia-shell ipc call settings toggle
 
   # Media keys
   bind=NONE,XF86AudioRaiseVolume,spawn,noctalia-shell ipc call volume increase
@@ -273,4 +273,31 @@ environment.etc."mango/config.conf".text = ''
   # Autostart — Noctalia shell and notification daemon
   exec-once=noctalia-shell
   exec-once=mako
+'';
+
+# Symlink system mango config to each normal user's ~/.config/mango/config.conf
+# Only creates if the user doesn't already have a custom config
+system.activationScripts.mango-user-config.text = ''
+  for DIR in /home/*/; do
+    USER_NAME=$(basename "$DIR")
+    # Skip if not a real user (uid >= 1000)
+    USER_ID=$(id -u "$USER_NAME" 2>/dev/null) || continue
+    [ "$USER_ID" -lt 1000 ] && continue
+
+    USER_GROUP=$(id -gn "$USER_NAME")
+    CONFIG_DIR="$DIR.config"
+    MANGO_DIR="$CONFIG_DIR/mango"
+    CONFIG="$MANGO_DIR/config.conf"
+
+    if [ ! -e "$CONFIG" ]; then
+      if [ ! -d "$CONFIG_DIR" ]; then
+        mkdir -p "$CONFIG_DIR"
+        chown "$USER_NAME":"$USER_GROUP" "$CONFIG_DIR"
+      fi
+      
+      mkdir -p "$MANGO_DIR"
+      cp /etc/mango/config.conf "$CONFIG"
+      chown -R "$USER_NAME":"$USER_GROUP" "$MANGO_DIR"
+    fi
+  done
 '';

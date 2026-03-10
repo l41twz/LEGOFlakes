@@ -250,19 +250,27 @@ environment.etc."niri/config.kdl".text = ''
 
 # Symlink system niri config to each normal user's ~/.config/niri/config.kdl
 # Only creates if the user doesn't already have a custom config
-system.activationScripts.niri-user-config = ''
+system.activationScripts.niri-user-config.text = ''
   for DIR in /home/*/; do
     USER_NAME=$(basename "$DIR")
     # Skip if not a real user (uid >= 1000)
     USER_ID=$(id -u "$USER_NAME" 2>/dev/null) || continue
     [ "$USER_ID" -lt 1000 ] && continue
 
-    NIRI_DIR="$DIR.config/niri"
+    USER_GROUP=$(id -gn "$USER_NAME")
+    CONFIG_DIR="$DIR.config"
+    NIRI_DIR="$CONFIG_DIR/niri"
     CONFIG="$NIRI_DIR/config.kdl"
+
     if [ ! -e "$CONFIG" ]; then
+      if [ ! -d "$CONFIG_DIR" ]; then
+        mkdir -p "$CONFIG_DIR"
+        chown "$USER_NAME":"$USER_GROUP" "$CONFIG_DIR"
+      fi
+
       mkdir -p "$NIRI_DIR"
-      ln -sf /etc/niri/config.kdl "$CONFIG"
-      chown -R "$USER_NAME":"$(id -gn "$USER_NAME")" "$NIRI_DIR"
+      cp /etc/niri/config.kdl "$CONFIG"
+      chown -R "$USER_NAME":"$USER_GROUP" "$NIRI_DIR"
     fi
   done
 '';
