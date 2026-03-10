@@ -4,7 +4,7 @@
 # ---
 programs.xwayland.enable = true;
 
-services.displayManager.sessionPackages = [ pkgs.mangowc ];
+services.displayManager.sessionPackages = [ mangowc-git ];
 
 xdg.portal = {
   enable = true;
@@ -15,7 +15,7 @@ xdg.portal = {
 };
 
 environment.systemPackages = with pkgs; [
-  mangowc
+  mangowc-git
   wl-clipboard
   brightnessctl
   grim
@@ -24,8 +24,9 @@ environment.systemPackages = with pkgs; [
   mako
   swaylock
   foot
+] ++ [
+  noctalia-git
 ] ++ (with pkgs-master; [
-  noctalia-shell
   quickshell
 ]);
 

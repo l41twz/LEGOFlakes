@@ -19,5 +19,26 @@
     "arg": "cachyos-kernel-overlays",
     "attr": "overlays",
     "follows_nixpkgs": false
+  },
+  {
+    "name": "niri",
+    "url": "github:YaLTeR/niri",
+    "arg": "niri-git",
+    "attr": "packages.${system}.niri",
+    "follows_nixpkgs": true
+  },
+  {
+    "name": "noctalia",
+    "url": "github:noctalia-dev/noctalia-shell",
+    "arg": "noctalia-git",
+    "attr": "packages.${system}.default",
+    "follows_nixpkgs": true
+  },
+  {
+    "name": "mangowc",
+    "url": "github:DreamMaoMao/mangowc",
+    "arg": "mangowc-git",
+    "attr": "packages.${system}.default",
+    "follows_nixpkgs": true
   }
 ]

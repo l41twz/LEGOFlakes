@@ -3,7 +3,7 @@
 # CATEGORY: apps
 # ---
 programs.niri.enable = true;
-programs.niri.package = pkgs-master.niri;
+programs.niri.package = niri-git;
 
 # XWayland for legacy X11 apps
 programs.xwayland.enable = true;
@@ -17,11 +17,12 @@ xdg.portal = {
   ];
 };
 
-environment.systemPackages = with pkgs-master; [
-  # Noctalia shell
-  noctalia-shell
+environment.systemPackages = [
+  # Noctalia shell (from flake input)
+  noctalia-git
+] ++ (with pkgs-master; [
   quickshell
-] ++ (with pkgs; [
+]) ++ (with pkgs; [
   # Wayland utilities
   swaylock
   fuzzel
@@ -50,7 +51,7 @@ services.gnome.evolution-data-server.enable = true;
 xdg.desktopEntries.niri = {
   name = "Niri";
   comment = "Niri scrollable-tiling Wayland compositor";
-  exec = "${pkgs-master.niri}/bin/niri-session";
+  exec = "${niri-git}/bin/niri-session";
   type = "Application";
   settings = {
     DesktopNames = "niri";
@@ -62,7 +63,7 @@ environment.etc."wayland-sessions/niri.desktop".text = ''
   [Desktop Entry]
   Name=Niri
   Comment=Niri scrollable-tiling Wayland compositor
-  Exec=${pkgs-master.niri}/bin/niri-session
+  Exec=${niri-git}/bin/niri-session
   Type=Application
   DesktopNames=niri
 '';
