@@ -191,8 +191,10 @@ environment.etc."niri/config.kdl".text = ''
       Mod+Shift+Page_Down { move-workspace-down; }
       Mod+Shift+Page_Up   { move-workspace-up; }
 
-      Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
-      Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+      // Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
+      // Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+      Mod+WheelScrollDown      cooldown-ms=150 { focus-column-right; }
+      Mod+WheelScrollUp        cooldown-ms=150 { focus-column-left; }
       Mod+Ctrl+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
       Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
 
