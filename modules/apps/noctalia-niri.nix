@@ -46,7 +46,29 @@ environment.sessionVariables = {
 # Calendar events support via evolution-data-server (for Noctalia)
 services.gnome.evolution-data-server.enable = true;
 
-# Default Niri config with keybindings and Noctalia autostart
+# Wayland session .desktop entry so greetd/tuigreet can discover niri
+xdg.desktopEntries.niri = {
+  name = "Niri";
+  comment = "Niri scrollable-tiling Wayland compositor";
+  exec = "${pkgs-master.niri}/bin/niri-session";
+  type = "Application";
+  settings = {
+    DesktopNames = "niri";
+  };
+};
+
+# Ensure the .desktop file is also available in wayland-sessions
+environment.etc."wayland-sessions/niri.desktop".text = ''
+  [Desktop Entry]
+  Name=Niri
+  Comment=Niri scrollable-tiling Wayland compositor
+  Exec=${pkgs-master.niri}/bin/niri-session
+  Type=Application
+  DesktopNames=niri
+'';
+
+# Default niri config — written to /etc/niri/config.kdl as a system default,
+# then symlinked to each real user's ~/.config/niri/config.kdl on activation.
 environment.etc."niri/config.kdl".text = ''
   // Input
   input {
@@ -223,4 +245,23 @@ environment.etc."niri/config.kdl".text = ''
       XF86MonBrightnessUp   { spawn "brightnessctl" "set" "+5%"; }
       XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
   }
+'';
+
+# Symlink system niri config to each normal user's ~/.config/niri/config.kdl
+# Only creates if the user doesn't already have a custom config
+system.activationScripts.niri-user-config = ''
+  for DIR in /home/*/; do
+    USER_NAME=$(basename "$DIR")
+    # Skip if not a real user (uid >= 1000)
+    USER_ID=$(id -u "$USER_NAME" 2>/dev/null) || continue
+    [ "$USER_ID" -lt 1000 ] && continue
+
+    NIRI_DIR="$DIR.config/niri"
+    CONFIG="$NIRI_DIR/config.kdl"
+    if [ ! -e "$CONFIG" ]; then
+      mkdir -p "$NIRI_DIR"
+      ln -sf /etc/niri/config.kdl "$CONFIG"
+      chown -R "$USER_NAME":"$(id -gn "$USER_NAME")" "$NIRI_DIR"
+    fi
+  done
 '';

@@ -6,11 +6,25 @@ services.greetd = {
   enable = true;
   settings = {
     default_session = {
-      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd bash --remember --remember-user-session --sessions /run/current-system/sw/share/wayland-sessions --xsessions /run/current-system/sw/share/xsessions";
+      command = ''
+        ${pkgs.greetd.tuigreet}/bin/tuigreet \
+          --time \
+          --asterisks \
+          --remember \
+          --remember-user-session \
+          --user-menu \
+          --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions \
+          --xsessions ${config.services.displayManager.sessionData.desktops}/share/xsessions
+        '';
       user = "greeter";
     };
   };
 };
+
+# Necessário para o "--remember" funcionar (cache da última sessão/usuário)
+systemd.tmpfiles.rules = [
+  "d /var/cache/tuigreet 0755 greeter greeter -"
+];
 
 environment.systemPackages = with pkgs; [
   greetd.tuigreet
