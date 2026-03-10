@@ -23,9 +23,9 @@
   keymap = "br-abnt2"
 
 [modules]
-  active = ["services/docker-engine", "overlays/allow-unfree", "system/udev-rules", "system/systemd-tweaks", "system/nerd-fonts", "apps/cli-utils", "system/nix-extra-options", "apps/obsidian", "services/firewall-ports", "hardware/pipewire-audio", "apps/obsidian-khoj", "apps/zen-browser", "hardware/gpu-nvidia-pascal", "system/ssh-agent-git", "system/wayland-base", "apps/mission-center", "system/kernel-cachyos", "hardware/cpu-amd", "services/ollama-ai-nvidia", "system/systemd-optimize", "services/khoj", "apps/wave-terminal", "hardware/keyboard-layout-xkb-ptbr", "apps/nemo-filemanager", "services/ssh-server", "apps/git-config", "system/zram-swap", "apps/dev-tools", "apps/noctalia-niri", "hardware/corsair-ckb-next", "system/gaming-sysctl", "system/systemd-boot", "hardware/bluetooth"]
+  active = ["hardware/bluetooth", "apps/greetd", "hardware/gpu-nvidia-pascal", "services/ollama-ai-nvidia", "hardware/pipewire-audio", "apps/mission-center", "hardware/cpu-amd", "system/systemd-optimize", "services/khoj", "services/ssh-server", "services/docker-engine", "system/udev-rules", "apps/obsidian-khoj", "system/wayland-base", "hardware/keyboard-layout-xkb-ptbr", "apps/fish-shell", "apps/cli-utils", "system/nix-extra-options", "apps/nemo-filemanager", "system/zram-swap", "apps/git-config-gnome", "overlays/allow-unfree", "system/kernel-cachyos", "apps/wave-terminal", "apps/noctalia-niri", "hardware/corsair-ckb-next", "system/systemd-tweaks", "apps/dev-tools", "apps/obsidian", "apps/zen-browser", "system/systemd-boot", "system/nerd-fonts", "services/firewall-ports", "system/gaming-sysctl"]
 
 [metadata]
   created_at = "2026-02-28T20:41:24Z"
-  last_modified = "2026-03-09T22:01:12Z"
+  last_modified = "2026-03-10T18:20:32Z"
   last_applied_flake = "ry3-20260309-161743.nix"

@@ -47,17 +47,6 @@ environment.sessionVariables = {
 # Calendar events support via evolution-data-server (for Noctalia)
 services.gnome.evolution-data-server.enable = true;
 
-# Wayland session .desktop entry so greetd/tuigreet can discover niri
-xdg.desktopEntries.niri = {
-  name = "Niri";
-  comment = "Niri scrollable-tiling Wayland compositor";
-  exec = "${niri-git}/bin/niri-session";
-  type = "Application";
-  settings = {
-    DesktopNames = "niri";
-  };
-};
-
 # Ensure the .desktop file is also available in wayland-sessions
 environment.etc."wayland-sessions/niri.desktop".text = ''
   [Desktop Entry]
