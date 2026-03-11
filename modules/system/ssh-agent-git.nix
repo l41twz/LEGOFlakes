@@ -1,4 +1,4 @@
-# NIXOS-LEGO-MODULE: ssh-agent-git-ry3
+# NIXOS-LEGO-MODULE: ssh-agent-git
 # PURPOSE: SSH agent configuration for git USER
 # CATEGORY: system
 # ---
@@ -7,6 +7,6 @@ programs.ssh.extraConfig = ''
 Host github.com
   HostName github.com
   User git
-  IdentityFile /home/ry3/.ssh/ry3
+  IdentityFile /home/"{{USER_NAME}}"/.ssh/"{{USER_NAME}}"
   IdentitiesOnly yes
 '';
