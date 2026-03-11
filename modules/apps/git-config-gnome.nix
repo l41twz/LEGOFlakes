@@ -4,6 +4,7 @@
 # NOTE: Use this INSTEAD of git-config for GNOME-based desktops.
 #        Includes credential helper via GNOME Keyring (libsecret).
 # ---
+services.gnome.gcr-ssh-agent.enable = false;
 programs.git = {
   enable = true;
   config = {
