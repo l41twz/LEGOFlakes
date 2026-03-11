@@ -4,4 +4,4 @@
 # ---
 programs.fish.enable = true;
 users.defaultUserShell = pkgs.fish;
-#users.users."{{USER_NAME}}".shell = pkgs.fish;
+users.users."{{USER_NAME}}".shell = pkgs.fish;
