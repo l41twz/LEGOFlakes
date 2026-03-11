@@ -1,4 +1,4 @@
-# NIXOS-LEGO-MODULE: ssh-agent-git
+# NIXOS-LEGO-MODULE: ssh-agent-git-ry3
 # PURPOSE: SSH agent configuration for git USER
 # CATEGORY: system
 # ---
