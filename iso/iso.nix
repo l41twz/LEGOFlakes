@@ -8,12 +8,8 @@
 let
   # Carrega secrets se o arquivo existir
   secrets =
-```nix
-    if builtins.pathExists ../secrets/gemini.key then
-      { gemini_api_key = builtins.readFile ../secrets/gemini.key; }
-    else if builtins.pathExists ../secrets/gemini.nix then
-```
-      import ./secrets/gemini.nix
+    if builtins.pathExists ./secrets/gemini.key then
+      import ./secrets/gemini.key
     else
       { gemini_api_key = "GEMINI_API_KEY_PLACEHOLDER"; };
 in
