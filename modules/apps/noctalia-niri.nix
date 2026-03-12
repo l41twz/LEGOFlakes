@@ -130,6 +130,25 @@ environment.etc."niri/config.kdl".text = ''
       open-floating true
   }
 
+  window-rule {
+    // Rounded corners for a modern look.
+    geometry-corner-radius 20
+
+    // Clips window contents to the rounded corner boundaries.
+    clip-to-geometry true
+}
+
+  // Allows notification actions and window activation from Noctalia.
+  debug {
+    honor-xdg-activation-with-invalid-serial
+  }
+
+  // Set the overview wallpaper on the backdrop.
+  layer-rule {
+    match namespace="^noctalia-overview*"
+    place-within-backdrop true
+  }
+
   // Core Noctalia binds
   Mod+Space { spawn-sh "noctalia-shell ipc call launcher toggle"; }
   Mod+Backslash { spawn-sh "noctalia-shell ipc call controlCenter toggle"; }

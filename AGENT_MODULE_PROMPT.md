@@ -602,3 +602,40 @@ Se o usuário pedir "converta em 1 módulo", tente respeitar, mas **avise** se o
 Se o usuário pedir "converta em vários módulos", divida agressivamente por funcionalidade.
 
 **LEMBRE-SE: O objetivo final é que qualquer pessoa — inclusive um iniciante em NixOS — consiga pegar essas peças LEGO e montar sua configuração sem saber nada de Nix modules, flakes ou a complexidade por trás. Cada peça deve ser autocontida, clara e funcional.**
+
+
+
+Arquitetura LEGOFlakes v2: Overlays vs. Flake-Inputs
+Este KI descreve a lógica de decisão para adicionar novos pacotes e modificar os existentes no sistema LEGOFlakes após a refatoração do sistema dinâmico de inputs.
+
+1. Lógica de Decisão: Onde colocar?
+Cenário	Onde agir	Mecanismo
+Pacote já existe no nixpkgs mas precisa de modificação (patch, versão, flag).	modules/overlays/	Usa o sistema de nixpkgs.overlays para substituir o pacote globalmente.
+Pacote NÃO existe em nenhuma versão do nixpkgs (unstable ou master).	flake-inputs.json	Adiciona o Flake oficial do autor como um input externo do sistema.
+2. Funcionamento do modules/overlays/
+Módulos nesta categoria devem usar a sintaxe de overlay do NixOS. O builder LEGO injeta esses trechos no arquivo final.
+
+Estratégia:
+
+Mantém o nome original do pacote no sistema.
+Afeta todos os outros módulos que dependem dele.
+Ideal para correções rápidas ou customizações de software já empacotado.
+3. Funcionamento do flake-inputs.json
+Sistema dinâmico que evita a edição manual do nix.go ou do base-flake.nix.
+
+Campos principais:
+
+name: Nome do input no Flake.
+url: Repositório Git/GitHub do software.
+arg: O nome da variável que será injetada em todos os módulos LEGO (ex: zen-browser-pkg).
+attr: Caminho dentro do flake para chegar no pacote.
+Como usar no módulo: Documentado em AGENT_MODULE_PROMPT.md, pacotes externos declarados aqui chegam como argumentos diretos no wrapper do módulo:
+
+nix
+# NIXOS-LEGO-MODULE: meu-app-externo
+# ---
+environment.systemPackages = [ meu-app-pkg ];
+4. Por que essa separação?
+Atomicidade: Evita "poluir" o base-flake.nix com dezenas de URLs de inputs.
+Manutenibilidade: Se um pacote migrar para o nixpkgs oficial, basta deletar a linha no JSON e mudar o módulo para usar pkgs.nome.
+Transparência: O arquivo JSON serve como uma lista clara de todas as dependências externas (não-NixOS) do sistema.

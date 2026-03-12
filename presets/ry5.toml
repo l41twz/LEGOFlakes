@@ -23,9 +23,9 @@
   keymap = "br-abnt2"
 
 [modules]
-  active = ["services/ollama-ai-nvidia", "system/ssh-agent-git-ry5", "hardware/keyboard-layout-xkb-ptbr", "apps/nemo-filemanager", "apps/dev-tools", "hardware/gpu-nvidia-pascal", "system/systemd-tweaks", "hardware/bluetooth", "hardware/corsair-ckb-next", "overlays/allow-unfree", "apps/mission-center", "services/khoj", "hardware/pipewire-audio", "apps/noctalia-niri", "services/firewall-ports", "hardware/cpu-amd", "apps/obsidian", "system/systemd-optimize", "system/zram-swap", "apps/fish-shell", "system/kernel-cachyos", "system/systemd-boot", "apps/greetd", "system/nix-extra-options", "system/udev-rules", "apps/git-config-gnome", "apps/cli-utils", "apps/zen-browser", "apps/wave-terminal", "system/wayland-base", "services/docker-engine", "system/gaming-sysctl", "apps/obsidian-khoj", "system/nerd-fonts"]
+  active = ["system/zram-swap", "system/ssh-agent-git", "apps/fish-shell", "apps/obsidian", "hardware/corsair-ckb-next", "system/nix-extra-options", "apps/zen-browser", "system/gaming-sysctl", "system/udev-rules", "apps/wave-terminal", "services/ssh-server", "system/kernel-cachyos", "hardware/pipewire-audio", "overlays/allow-unfree", "services/docker-engine", "services/ollama-ai-nvidia", "services/khoj", "system/systemd-boot", "apps/obsidian-khoj", "apps/git-config-gnome", "apps/greetd", "apps/dev-tools", "apps/noctalia-niri", "system/wayland-base", "hardware/gpu-nvidia-pascal", "system/systemd-tweaks", "system/systemd-optimize", "apps/cli-utils", "hardware/keyboard-layout-xkb-ptbr", "hardware/bluetooth", "hardware/cpu-amd", "system/ssh-agent-git-ry5", "apps/mission-center", "services/firewall-ports", "system/nerd-fonts"]
 
 [metadata]
   created_at = "2026-02-28T20:41:24Z"
-  last_modified = "2026-03-11T22:28:41Z"
-  last_applied_flake = "ry5-20260311-192841.nix"
+  last_modified = "2026-03-12T19:41:36Z"
+  last_applied_flake = "ry5-20260312-164136.nix"
