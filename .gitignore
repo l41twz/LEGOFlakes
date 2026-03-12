@@ -8,6 +8,8 @@ hosts/*/secrets/*.pem
 hosts/*/secrets/*.age
 *.secret
 secrets/*.key
+iso/secrets/*.key
+iso/secrets/*.nix
 
 # Nix
 .direnv/
