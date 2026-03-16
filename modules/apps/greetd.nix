@@ -7,7 +7,7 @@ services.greetd = {
   settings = {
     default_session = {
       command = ''
-        ${pkgs.greetd.tuigreet}/bin/tuigreet \
+        ${pkgs.tuigreet}/bin/tuigreet \
           --time \
           --asterisks \
           --remember \
@@ -27,5 +27,5 @@ systemd.tmpfiles.rules = [
 ];
 
 environment.systemPackages = with pkgs; [
-  greetd.tuigreet
+  tuigreet
 ];

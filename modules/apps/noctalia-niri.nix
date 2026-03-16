@@ -33,6 +33,14 @@ environment.systemPackages = [
   slurp
   swappy
   foot
+  nwg-look
+  nautilus
+  bibata-cursors-translucent
+  gnome-text-editor
+
+  # Cursor & Icon themes (macOS-style)
+  whitesur-cursors       # macOS-inspired cursor theme
+  colloid-icon-theme     # macOS-style icon pack (vinceliuice)
 ]);
 
 environment.sessionVariables = {
@@ -42,6 +50,10 @@ environment.sessionVariables = {
   SDL_VIDEODRIVER = "wayland";
   XDG_SESSION_TYPE = "wayland";
   XDG_CURRENT_DESKTOP = "niri";
+
+  # macOS-style cursor
+  XCURSOR_THEME = "WhiteSur-cursors";
+  XCURSOR_SIZE = "24";
 };
 
 # Calendar events support via evolution-data-server (for Noctalia)

@@ -23,9 +23,9 @@
   keymap = "br-abnt2"
 
 [modules]
-  active = ["system/zram-swap", "system/ssh-agent-git", "apps/fish-shell", "apps/obsidian", "hardware/corsair-ckb-next", "system/nix-extra-options", "apps/zen-browser", "system/gaming-sysctl", "system/udev-rules", "apps/wave-terminal", "services/ssh-server", "system/kernel-cachyos", "hardware/pipewire-audio", "overlays/allow-unfree", "services/docker-engine", "services/ollama-ai-nvidia", "services/khoj", "system/systemd-boot", "apps/obsidian-khoj", "apps/git-config-gnome", "apps/greetd", "apps/dev-tools", "apps/noctalia-niri", "system/wayland-base", "hardware/gpu-nvidia-pascal", "system/systemd-tweaks", "system/systemd-optimize", "apps/cli-utils", "hardware/keyboard-layout-xkb-ptbr", "hardware/bluetooth", "hardware/cpu-amd", "system/ssh-agent-git-ry5", "apps/mission-center", "services/firewall-ports", "system/nerd-fonts"]
+  active = ["apps/obsidian", "hardware/keyboard-layout-xkb-ptbr", "system/zram-swap", "system/nix-extra-options", "system/kernel-cachyos", "system/systemd-boot", "hardware/gpu-nvidia-pascal", "hardware/bluetooth", "system/udev-rules", "apps/greetd", "system/ssh-agent-git", "system/systemd-optimize", "apps/dev-tools", "system/nerd-fonts", "services/speaches-stt-tts-nvidia", "apps/obsidian-khoj", "apps/cli-utils", "services/khoj", "overlays/allow-unfree", "hardware/pipewire-audio", "system/gaming-sysctl", "services/docker-engine", "apps/zed-editor", "apps/fish-shell", "apps/git-config-gnome", "system/systemd-tweaks", "hardware/corsair-ckb-next", "apps/noctalia-niri", "services/llama-cpp-qwen-server", "system/ssh-agent-git-ry5", "hardware/cpu-amd", "apps/mission-center", "apps/zen-browser", "apps/wave-terminal", "services/ssh-server", "system/wayland-base", "services/firewall-ports"]
 
 [metadata]
   created_at = "2026-02-28T20:41:24Z"
-  last_modified = "2026-03-12T19:41:36Z"
-  last_applied_flake = "ry5-20260312-164136.nix"
+  last_modified = "2026-03-16T20:06:25Z"
+  last_applied_flake = "ry5-20260316-170625.nix"

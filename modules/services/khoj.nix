@@ -12,6 +12,16 @@
 #
 # Requer: docker-engine module
 
+# ── SearXNG settings.yml declarativo ──
+# O conteúdo de services/searxng-settings.yml é injetado inline pelo builder
+# via {{EMBED:path}} — sem necessidade de copiar arquivos para /etc/nixos/.
+environment.etc."searxng/settings.yml" = {
+  text = ''
+{{EMBED:services/searxng-settings.yml}}
+  '';
+  mode = "0644";
+};
+
 # ── Rede Docker compartilhada ──
 # No docker-compose, todos os serviços compartilham uma rede bridge automaticamente.
 # No NixOS precisamos criar essa rede manualmente para que os containers se
@@ -22,6 +32,7 @@ systemd.services.docker-network-khoj = {
   requires = [ "docker.service" ];
   before = [
     "docker-khoj-database.service"
+    "docker-khoj-valkey.service"
     "docker-khoj-sandbox.service"
     "docker-khoj-search.service"
     "docker-khoj-computer.service"
@@ -74,13 +85,33 @@ virtualisation.oci-containers.containers = {
     ];
   };
 
+  # ── valkey (redis-compatible, backend para SearXNG limiter) ──
+  khoj-valkey = {
+    image = "docker.io/valkey/valkey:8-alpine";
+    volumes = [ "khoj_valkey:/data" ];
+    cmd = [ "valkey-server" "--save" "30" "1" "--loglevel" "warning" ];
+    extraOptions = [
+      "--network=khoj-net"
+      "--network-alias=valkey"
+      "--health-cmd=valkey-cli ping"
+      "--health-interval=30s"
+      "--health-timeout=10s"
+      "--health-retries=3"
+    ];
+  };
+
   # ── search ──
   khoj-search = {
     image = "docker.io/searxng/searxng:latest";
-    volumes = [ "khoj_search:/etc/searxng" ];
+    dependsOn = [ "khoj-valkey" ];
+    volumes = [
+      "/etc/searxng/settings.yml:/etc/searxng/settings.yml:ro"
+    ];
     environment = {
       SEARXNG_BASE_URL = "http://localhost:8080/";
+      SEARXNG_VALKEY_URL = "valkey://valkey:6379/0";
     };
+    ports = [ "8080:8080" ];
     extraOptions = [
       "--network=khoj-net"
       "--network-alias=search"
@@ -97,6 +128,7 @@ virtualisation.oci-containers.containers = {
     extraOptions = [
       "--network=khoj-net"
       "--network-alias=computer"
+      "--tmpfs=/run/user/1001:uid=1001,gid=37,mode=0700"
     ];
   };
 
@@ -128,10 +160,11 @@ virtualisation.oci-containers.containers = {
       # Uncomment line below to have Khoj run code in remote E2B code sandbox instead of the self-hosted Terrarium sandbox above. Get your E2B API key from https://e2b.dev/.
       # E2B_API_KEY = "your_e2b_api_key";
 
-      # Uncomment line below to use with Ollama running on your local machine at localhost:11434.
-      # Change URL to use with other OpenAI API compatible providers like VLLM, LMStudio, DeepInfra, DeepSeek etc.
-      OPENAI_BASE_URL = "http://host.docker.internal:11434/v1/";
-      KHOJ_DEFAULT_CHAT_MODEL = "ministral-3:3b-instruct-2512-q4_K_M";
+      # OPENAI_BASE_URL = "http://host.docker.internal:11434/v1/";  # Ollama (desativado)
+      OPENAI_BASE_URL = "http://host.docker.internal:11435/v1/";  # llama.cpp (OpenAI-compatible)
+      # OLLAMA_BASE_URL não é usado — llama.cpp não implementa a API do Ollama.
+      OPENAI_API_KEY = "sk-no-key-required";
+      # KHOJ_DEFAULT_CHAT_MODEL = "qwen";
       #
       # Uncomment appropriate lines below to use chat models by OpenAI, Anthropic, Google.
       # Ensure you set your provider specific API keys.
@@ -158,11 +191,10 @@ virtualisation.oci-containers.containers = {
       # Uncomment the necessary lines below to make your instance publicly accessible.
       # Proceed with caution, especially if you are using anonymous mode.
       # ---
-      # KHOJ_NO_HTTPS = "True";
+      KHOJ_NO_HTTPS = "True";
       # Replace the KHOJ_DOMAIN with the server's externally accessible domain or I.P address from a remote machie (no http/https prefix).
       # Ensure this is set correctly to avoid CSRF trusted origin or unset cookie issue when trying to access the admin panel.
-      # KHOJ_DOMAIN = "192.168.0.104";
-      # KHOJ_DOMAIN = "khoj.example.com";
+      KHOJ_DOMAIN = "192.168.0.2";
       # Replace the KHOJ_ALLOWED_DOMAIN with the server's internally accessible domain or I.P address on the host machine (no http/https prefix).
       # Only set if using a load balancer/reverse_proxy in front of your Khoj server. If unset, it defaults to KHOJ_DOMAIN.
       # For example, if the load balancer service is added to the khoj docker network, set KHOJ_ALLOWED_DOMAIN to khoj's docker service name: `server'.

@@ -21,6 +21,7 @@ environment.systemPackages = with pkgs; [
   micro
   lapce
   gum
+  uv
 ];
 # Ativa o direnv e as integrações de shell
 programs.direnv = {

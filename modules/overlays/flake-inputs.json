@@ -40,5 +40,12 @@
     "arg": "mangowc-git",
     "attr": "packages.${system}.default",
     "follows_nixpkgs": true
+  },
+  {
+    "name": "zed-editor",
+    "url": "github:zed-industries/zed",
+    "arg": "zed-editor-pkg",
+    "attr": "packages.${system}.default",
+    "follows_nixpkgs": false
   }
 ]

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -185,6 +186,10 @@ func BuildFlake(root string, preset *Preset, modules []string, customName string
 		modPurpose := strings.TrimPrefix(lines[1], "# PURPOSE: ")
 		body := strings.TrimRight(strings.Join(lines[4:], "\n"), "\n ")
 
+		// Resolve {{EMBED:path}} markers — reads the referenced file from
+		// modules/ directory and inlines its content as a Nix multiline string.
+		body = resolveEmbeds(root, body)
+
 		moduleContent.WriteString("\n")
 		moduleContent.WriteString(indent + "# ── " + modName + " ── " + modPurpose + "\n")
 		moduleContent.WriteString(indent + "({ " + wrapperArgs + ", ... }: {\n")
@@ -301,6 +306,39 @@ func generateDevShellsSnippet(shells []DevShell) string {
 	}
 	sb.WriteString("    };\n")
 	return sb.String()
+}
+
+// escapeForNixMultiline escapes a string for use inside Nix ” ” multiline strings.
+// Two rules: ” → ”' (so Nix doesn't see end-of-string) and ${ → ”${ (so Nix
+// doesn't interpret interpolation).
+func escapeForNixMultiline(s string) string {
+	// Order matters: escape '' first, then ${
+	s = strings.ReplaceAll(s, "''", "'''")
+	s = strings.ReplaceAll(s, "${", "''${")
+	return s
+}
+
+// resolveEmbeds finds {{EMBED:relative/path}} markers in module body text,
+// reads the referenced file from the modules/ directory, escapes it for Nix
+// multiline strings, and replaces the marker with the file content inline.
+// Example: {{EMBED:services/searxng-settings.yml}} reads modules/services/searxng-settings.yml
+var embedRe = regexp.MustCompile(`\{\{EMBED:([^}]+)\}\}`)
+
+func resolveEmbeds(root, body string) string {
+	return embedRe.ReplaceAllStringFunc(body, func(match string) string {
+		sub := embedRe.FindStringSubmatch(match)
+		if len(sub) < 2 {
+			return match
+		}
+		relPath := strings.TrimSpace(sub[1])
+		filePath := filepath.Join(root, "modules", relPath)
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Printf("Aviso: EMBED falhou para %q: %v\n", relPath, err)
+			return match // keep original marker on failure
+		}
+		return escapeForNixMultiline(string(data))
+	})
 }
 
 // PrepareRebuild copies the selected flake to flake.nix, runs git add,
